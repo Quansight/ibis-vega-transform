@@ -7,7 +7,7 @@ from .util import promote_list
 
 # These submodules register appropriate visitors.
 
-__all__ = ['apply']
+__all__ = ["apply"]
 
 
 def apply(expr: ibis.Expr, transforms: Any) -> ibis.Expr:
@@ -34,11 +34,12 @@ def apply(expr: ibis.Expr, transforms: Any) -> ibis.Expr:
         expr = _delegate_transform(t, expr)
     return expr
 
+
 def _delegate_transform(transform: dict, expr: ibis.Expr) -> ibis.Expr:
     t = transform["type"]
-    if t == 'filter':
+    if t == "filter":
         return filter(transform, expr)
-    elif t == 'formula':
+    elif t == "formula":
         return formula(transform, expr)
     else:
         raise NotImplementedError(f"Transform of type {t} is not implemented")
