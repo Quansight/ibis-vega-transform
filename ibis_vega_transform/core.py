@@ -41,5 +41,7 @@ def _delegate_transform(transform: dict, expr: ibis.Expr) -> ibis.Expr:
         return filter(transform, expr)
     elif t == "formula":
         return formula(transform, expr)
+    elif t == "collect":
+        return collect(transform, expr)
     else:
         raise NotImplementedError(f"Transform of type {t} is not implemented")
