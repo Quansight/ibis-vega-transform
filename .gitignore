@@ -1,0 +1,11 @@
+*ipynb_checkpoints
+.cache
+.ipython
+.jupyter
+.local
+__pycache__
+.config
+.mypy_cache
+.vscode
+*.egg-info
+**/altair-data-*
