@@ -1,5 +1,5 @@
 import ibis
-from altair_transform.vegaexpr import eval_vegajs
+from ibis_vega_transform.vegaexpr import eval_vegajs
 
 
 def formula(transform: dict, expr: ibis.Expr) -> ibis.Expr:
