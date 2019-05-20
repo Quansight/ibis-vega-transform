@@ -8,4 +8,4 @@ __version__ = "0.1.0.dev0"
 __all__ = ["apply", "transforms"]
 
 from .core import apply
-import transforms
+from . import transforms

@@ -4,7 +4,6 @@ import ibis
 
 from . import transforms
 from .util import promote_list
-import vegaexpr
 
 # These submodules register appropriate visitors.
 
