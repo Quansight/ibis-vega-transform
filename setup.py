@@ -9,7 +9,7 @@ setuptools.setup(
     license="BSD 3-Clause",
     description="Turn vega transforms into Ibis expressions",
     packages=setuptools.find_packages(),
-    install_requires=["ibis-framework"],
+    install_requires=["ibis-framework", "mypy_extensions", "typing_extensions"],
     python_requires=">=3.6",
     include_package_data=True,
 )

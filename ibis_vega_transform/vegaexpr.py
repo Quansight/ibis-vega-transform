@@ -5,12 +5,15 @@ import datetime as dt
 import math
 import random
 import sys
-from typing import * 
-
-import pytz
+from typing import *
+import functools
+import operator
 
 import ibis
 import ibis.expr.types as it
+import pytz
+from mypy_extensions import TypedDict
+from typing_extensions import Literal
 
 from altair_transform.utils import evaljs
 
@@ -74,7 +77,7 @@ def toBoolean(value: Any) -> bool:
     Coerces the input value to a boolean.
     Null values and empty strings are mapped to null.
     """
-    return value.cast('boolean')
+    return value.cast("boolean")
 
 
 def toDate(value: Any) -> Optional[dt.datetime]:
@@ -84,7 +87,7 @@ def toDate(value: Any) -> Optional[dt.datetime]:
     If an optional parser function is provided, it is used to
     perform date parsing, otherwise Date.parse is used.
     """
-    return value.cast('timestamp')
+    return value.cast("timestamp")
 
 
 def toNumber(value: Any) -> Optional[float]:
@@ -92,7 +95,7 @@ def toNumber(value: Any) -> Optional[float]:
     Coerces the input value to a number.
     Null values and empty strings are mapped to null.
     """
-    return value.cast('double') 
+    return value.cast("double")
 
 
 def toString(value: Any) -> Optional[str]:
@@ -100,7 +103,7 @@ def toString(value: Any) -> Optional[str]:
     Coerces the input value to a string.
     Null values and empty strings are mapped to null.
     """
-    return value.cast('string')
+    return value.cast("string")
 
 
 # Date/Time Functions
@@ -109,14 +112,28 @@ def now() -> float:
     return ibis.now()
 
 
-def datetime(year: int, month: int, day: int = 0, hour: int = 0,
-             min: int = 0, sec: int = 0, millisec: int = 0) -> dt.datetime:
+def datetime(
+    year: int,
+    month: int,
+    day: int = 0,
+    hour: int = 0,
+    min: int = 0,
+    sec: int = 0,
+    millisec: int = 0,
+) -> dt.datetime:
     """Returns a new Date instance.
     The month is 0-based, such that 1 represents February.
     """
     # TODO: do we need a local timezone?
-    return dt.datetime(int(year), int(month) + 1, int(day), int(hour),
-                       int(min), int(sec), int(millisec * 1000))
+    return dt.datetime(
+        int(year),
+        int(month) + 1,
+        int(day),
+        int(hour),
+        int(min),
+        int(sec),
+        int(millisec * 1000),
+    )
 
 
 def date(datetime: dt.datetime) -> int:
@@ -192,15 +209,96 @@ def timezoneoffset(datetime):
     raise NotImplementedError("timezoneoffset()")
 
 
-def utc(year: int, month: int, day: int = 0, hour: int = 0,
-        min: int = 0, sec: int = 0, millisec: int = 0) -> dt.datetime:
+def utc(
+    year: int,
+    month: int,
+    day: int = 0,
+    hour: int = 0,
+    min: int = 0,
+    sec: int = 0,
+    millisec: int = 0,
+) -> dt.datetime:
     """
     Returns a timestamp for the given UTC date.
     The month is 0-based, such that 1 represents February.
     """
-    return dt.datetime(int(year), int(month) + 1, int(day), int(hour),
-                       int(min), int(sec), int(millisec * 1000),
-                       tzinfo=pytz.UTC)
+    return dt.datetime(
+        int(year),
+        int(month) + 1,
+        int(day),
+        int(hour),
+        int(min),
+        int(sec),
+        int(millisec * 1000),
+        tzinfo=pytz.UTC,
+    )
+
+
+FieldDict = TypedDict(
+    "FieldDict",
+    {
+        "field": str,
+        #  identifies whether tuples in the dataset enumerate values for the field, or specify a continuous range.
+        "type": Literal["E", "R", "R-E", "R-LE", "R-RE"],
+    },
+)
+
+SelectionDict = TypedDict("SelectionDict", {"fields": List[FieldDict], "values": List})
+
+
+def _test_single_point(expr: ibis.Expr, field: FieldDict, value: Any) -> ibis.Expr:
+    column = expr[field["field"]]
+    tp = field["type"]
+    if tp == "E":
+        if isinstance(value, list):
+            return column.isin(value)
+        return column == value
+    lower, upper = value
+    if tp == "R":
+        return (lower <= column) & (column <= upper)
+    if tp == "R-RE":
+        return (lower <= column) & (column < upper)
+    if tp == "R-LE":
+        return (lower < column) & (column <= upper)
+    raise NotImplementedError(f"dont recoognize {tp}")
+
+
+def _test_point(expr: ibis.Expr, entry: SelectionDict) -> ibis.Expr:
+    """
+    Translated from
+    https://github.com/vega/vega/blob/353a4097a5c726ec6b5b1df71722976d246c6cd7/packages/vega-selections/src/selectionTest.js#L12-L48
+    and
+    https://github.com/vega/vega/blob/master/packages/vega-util/src/inrange.js
+    """
+    return functools.reduce(
+        operator.and_,
+        (
+            _test_single_point(expr, field, value)
+            for field, value in zip(entry["fields"], entry["values"])
+        ),
+    )
+
+
+def vlSelectionTest(
+    filters: List[SelectionDict],
+    expr: ibis.Expr,
+    op: Literal["union", "intersect"] = "union",
+) -> ibis.Expr:
+    """
+    Instead of passing in the data name as the first arg, we pass in the actual data, like:
+
+    >>>  [{'fields': [{'type': 'E', 'field': 'c'}], 'values': ['second']}]
+
+    Translated from:
+
+    https://github.com/vega/vega/blob/353a4097a5c726ec6b5b1df71722976d246c6cd7/packages/vega-selections/src/selectionTest.js#L50-L63
+    """
+    if not filters:
+        return expr
+    return functools.reduce(
+        {"union": operator.or_, "intersect": operator.and_}[op],
+        (_test_point(expr, f) for f in filters),
+    )
 
 
 # From https://vega.github.io/vega/docs/expressions/
@@ -218,7 +316,6 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     "PI": math.pi,
     "SQRT1_2": math.sqrt(0.5),
     "SQRT2": math.sqrt(2),
-
     # Type Checking
     "isArray": isArray,
     "isBoolean": isBoolean,
@@ -227,15 +324,12 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     "isObject": isObject,
     "isRegExp": isRegExp,
     "isString": isString,
-
     # Type Coercion
     "toBoolean": toBoolean,
     "toDate": toDate,
     "toNumber": toNumber,
     "toString": toString,
-
     # Control Flow Functions
-
     # Math Functions
     "isNan": lambda x: x.isnull(),
     "abs": ibis.expr.api.abs,
@@ -256,7 +350,6 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     "sin": ibis.expr.api.sin,
     "sqrt": ibis.expr.api.sqrt,
     "tan": ibis.expr.api.tan,
-
     # Date/Time Functions
     "now": now,
     "datetime": datetime,
@@ -272,7 +365,8 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     "time": time,
     "timezoneoffset": timezoneoffset,
     "utc": utc,
-
+    "length": len,
+    "vlSelectionTest": vlSelectionTest
     # TODOs:
     # Remaining Date/Time Functions
     # Array Functions
