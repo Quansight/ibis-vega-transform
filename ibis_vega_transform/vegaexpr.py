@@ -330,6 +330,7 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     "toNumber": toNumber,
     "toString": toString,
     # Control Flow Functions
+    "if": lambda test, true_expr, false_expr: ibis.ifelse(test, true_expr, false_expr),
     # Math Functions
     "isNan": lambda x: x.isnull(),
     "abs": ibis.expr.api.abs,
