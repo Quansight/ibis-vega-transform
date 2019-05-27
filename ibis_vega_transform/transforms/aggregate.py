@@ -20,9 +20,23 @@ def aggregate(transform: dict, expr: ibis.Expr) -> ibis.Expr:
 
 def _aggregate(expr, field, op, name):
     expr = expr[field] if field else expr
-    expr = getattr(expr, _translate_op(op))()
+    operation = _translate_op(op)
+    if not operation:
+        raise ValueError(f"Unsupported op {op}")
+    expr = operation(expr)
     return expr.name(name) if name else expr
 
 
 def _translate_op(op: str) -> str:
-    return {"mean": "mean", "average": "mean", "count": "count"}.get(op, op)
+    return {
+        "count": ibis.expr.api.count,
+        "distinct": ibis.expr.api.distinct,
+        "sum": ibis.expr.api.sum,
+        "mean": ibis.expr.api.mean,
+        "average": ibis.expr.api.mean,
+        "variance": ibis.expr.api.variance,
+        "stdev": ibis.expr.api.std,
+        "median": ibis.expr.api.approx_median,
+        "min": ibis.expr.api.min,
+        "max": ibis.expr.api.max,
+    }.get(op)
