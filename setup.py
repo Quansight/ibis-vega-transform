@@ -1,9 +1,11 @@
 import os
 import setuptools
 
-def read(path, encoding='utf-8'):
+
+def read(path, encoding="utf-8"):
     path = os.path.join(os.path.dirname(__file__), path)
     return open(path, encoding=encoding).read() if os.path.exists(path) else ""
+
 
 setuptools.setup(
     name="ibis-vega-transform",
@@ -20,7 +22,7 @@ setuptools.setup(
         "altair-transform",
         "ibis-framework",
         "mypy_extensions",
-        "typing_extensions"
+        "typing_extensions",
     ],
     python_requires=">=3.6",
     include_package_data=True,
