@@ -1,5 +1,5 @@
 """
-Evaluate vega expressions language
+Evaluate vega expressions using ibis
 """
 import datetime as dt
 import math
@@ -238,7 +238,8 @@ FieldDict = TypedDict(
     "FieldDict",
     {
         "field": str,
-        #  identifies whether tuples in the dataset enumerate values for the field, or specify a continuous range.
+        # identifies whether tuples in the dataset enumerate values for the
+        # field, or specify a continuous range.
         "type": Literal["E", "R", "R-E", "R-LE", "R-RE"],
     },
 )

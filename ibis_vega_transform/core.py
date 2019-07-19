@@ -5,8 +5,6 @@ import ibis
 from . import transforms
 from .util import promote_list
 
-# These submodules register appropriate visitors.
-
 __all__ = ["apply"]
 
 
@@ -16,7 +14,7 @@ def apply(expr: ibis.Expr, transforms: Any) -> ibis.Expr:
     Parameters
     ----------
     expr: ibis.Expr
-    transform : list
+    transform: list
         A transform specification or list of transform specifications.
         Each specification must be valid according to Vega's transform
         schema.
@@ -36,6 +34,25 @@ def apply(expr: ibis.Expr, transforms: Any) -> ibis.Expr:
 
 
 def _delegate_transform(transform: dict, expr: ibis.Expr) -> ibis.Expr:
+    """
+    Apply a vega transform to an ibis expression.
+
+    Applying this function iteratively to an expression allows the user
+    to build up a compound expression out of many vega transforms.
+
+    If a particular transform is not implemented, raises an error.
+
+    Parameters
+    ----------
+    transform: dict
+        A JSON-able representation of a vega transform.
+    expr: ibis.Expr
+        An expression to transform.
+
+    Returns
+    -------
+    expr_transformed: The original expression with the additional transform.
+    """
     t = getattr(transforms, transform["type"])
     if t is not None:
         return t(transform, expr)
