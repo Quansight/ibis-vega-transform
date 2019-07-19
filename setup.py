@@ -14,7 +14,7 @@ setuptools.setup(
     author="Ian Rose and Saul Shanabrook",
     author_email="ian.rose@quansight.com",
     license="Apache-2.0 license",
-    description="Evaluate vega transforms using Ibis expressions",
+    description="Evaluate Vega transforms using Ibis expressions",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
