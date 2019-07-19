@@ -63,7 +63,7 @@ def _aggregate(
     return expr.name(name) if name else expr
 
 
-def _translate_op(op: str) -> Optional[Callable[[it.ColumnValue], ibis.Expr]]:
+def _translate_op(op: str) -> Optional[Callable[[it.AnyColumn], ibis.Expr]]:
     """
     Map a vega op (https://vega.github.io/vega/docs/transforms/aggregate/#ops)
     to an ibis expression operation.
