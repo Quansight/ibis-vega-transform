@@ -11,7 +11,6 @@ import operator
 
 import ibis
 import ibis.expr.types as it
-import pytz
 from mypy_extensions import TypedDict
 from typing_extensions import Literal
 
@@ -112,96 +111,138 @@ def now() -> float:
     return ibis.now()
 
 
-def datetime(
-    year: int,
-    month: int,
-    day: int = 0,
-    hour: int = 0,
-    min: int = 0,
-    sec: int = 0,
-    millisec: int = 0,
-) -> dt.datetime:
-    """Returns a new Date instance.
-    The month is 0-based, such that 1 represents February.
+def z(v) -> bool:
     """
-    # TODO: do we need a local timezone?
-    return dt.datetime(
-        int(year),
-        int(month) + 1,
-        int(day),
-        int(hour),
-        int(min),
-        int(sec),
-        int(millisec * 1000),
-    )
+    Returns whether the value is equal to a literal 0
+    """
+    return not isinstance(v, ibis.expr.types.Expr) and v == 0
 
 
-def date(datetime: dt.datetime) -> int:
+def datetime(y, m, d, h, mi, s, ms):
+    """
+    This should use https://github.com/ibis-project/ibis/issues/386 if it gets implemented
+
+    Currently we only support use cases that can be turned into a truncate, which is:
+
+        datetime(year(col), 0, 0, 0, 0, 0)
+        or
+        datetime(year(col), month(col), 0, 0, 0, 0)
+        etc.
+    """
+    if not hasattr(y, "_arg"):
+        raise NotImplementedError()
+    if not isinstance(y._arg, ibis.expr.operations.ExtractYear):
+        raise NotImplementedError()
+    date_column = y._arg.arg
+
+    if z(m):
+        if not z(d) or not z(h) or not z(mi) or not z(s) or not z(ms):
+            raise NotImplementedError()
+        return date_column.truncate("year")
+    if not m.equals(month(date_column)):
+        raise NotImplementedError()
+
+    if z(d):
+        if not z(h) or not z(mi) or not z(s) or not z(ms):
+            raise NotImplementedError()
+        return date_column.truncate("month")
+    if not d.equals(date(date_column)):
+        raise NotImplementedError(f"{d}, {day(date_column)}")
+
+    if z(h):
+        if not z(mi) or not z(s) or not z(ms):
+            raise NotImplementedError()
+        return date_column.truncate("day")
+    if not h.equals(hours(date_column)):
+        raise NotImplementedError()
+
+    if z(mi):
+        if not z(s) or not z(ms):
+            raise NotImplementedError()
+        return date_column.truncate("hour")
+    if not mi.equals(minutes(date_column)):
+        raise NotImplementedError()
+
+    if z(s):
+        if not z(ms):
+            raise NotImplementedError()
+        return date_column.truncate("minute")
+    if not s.equals(seconds(date_column)):
+        raise NotImplementedError()
+
+    if z(ms):
+        return date_column.truncate("second")
+    if not ms.equals(milliseconds(date_column)):
+        raise NotImplementedError()
+    return date_column
+
+
+def date(datetime):
     """
     Returns the day of the month for the given datetime value, in local time.
     """
-    return datetime.day
+    return datetime.day()
 
 
-def day(datetime: dt.datetime) -> int:
+def day(datetime):
     """
     Returns the day of the week for the given datetime value, in local time.
     """
-    return (datetime.weekday() + 1) % 7
+    return datetime.day_of_week.index()
 
 
-def year(datetime: dt.datetime) -> int:
+def year(datetime):
     """Returns the year for the given datetime value, in local time."""
-    return datetime.year
+    return datetime.year()
 
 
-def quarter(datetime: dt.datetime) -> int:
+def quarter(datetime):
     """
     Returns the quarter of the year (0-3) for the given datetime value,
     in local time.
     """
-    return (datetime.month - 1) // 3
+    return (datetime.month() - 1) // 3
 
 
-def month(datetime: dt.datetime) -> int:
+def month(datetime):
     """
     Returns the (zero-based) month for the given datetime value, in local time.
     """
-    return datetime.month - 1
+    return datetime.month() - 1
 
 
-def hours(datetime: dt.datetime) -> int:
+def hours(datetime):
     """
     Returns the hours component for the given datetime value, in local time.
     """
-    return datetime.hour
+    return datetime.hour()
 
 
-def minutes(datetime: dt.datetime) -> int:
+def minutes(datetime):
     """
     Returns the minutes component for the given datetime value, in local time.
     """
-    return datetime.minute
+    return datetime.minute()
 
 
-def seconds(datetime: dt.datetime) -> int:
+def seconds(datetime):
     """
     Returns the seconds component for the given datetime value, in local time.
     """
-    return datetime.second
+    return datetime.second()
 
 
-def milliseconds(datetime: dt.datetime) -> float:
+def milliseconds(datetime) -> float:
     """
     Returns the milliseconds component for the given datetime value,
     in local time.
     """
-    return datetime.microsecond / 1000
+    return datetime.millisecond()
 
 
-def time(datetime: dt.datetime) -> float:
+def time(datetime) -> float:
     """Returns the epoch-based timestamp for the given datetime value."""
-    return datetime.timestamp() * 1000
+    raise NotImplementedError("time()")
 
 
 def timezoneoffset(datetime):
@@ -209,29 +250,22 @@ def timezoneoffset(datetime):
     raise NotImplementedError("timezoneoffset()")
 
 
-def utc(
-    year: int,
-    month: int,
-    day: int = 0,
-    hour: int = 0,
-    min: int = 0,
-    sec: int = 0,
-    millisec: int = 0,
-) -> dt.datetime:
+def utc(year, month, day=0, hour=0, min=0, sec=0, millisec=0):
     """
     Returns a timestamp for the given UTC date.
     The month is 0-based, such that 1 represents February.
     """
-    return dt.datetime(
-        int(year),
-        int(month) + 1,
-        int(day),
-        int(hour),
-        int(min),
-        int(sec),
-        int(millisec * 1000),
-        tzinfo=pytz.UTC,
-    )
+    raise NotImplementedError("utc()")
+    # return dt.datetime(
+    #     int(year),
+    #     int(month) + 1,
+    #     int(day),
+    #     int(hour),
+    #     int(min),
+    #     int(sec),
+    #     int(millisec * 1000),
+    #     tzinfo=pytz.UTC,
+    # )
 
 
 FieldDict = TypedDict(
