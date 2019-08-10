@@ -15,6 +15,54 @@ from mypy_extensions import TypedDict
 from typing_extensions import Literal
 
 from altair_transform.utils import evaljs
+import altair_transform.utils._evaljs
+
+# Monkey patch altair_transform so that evalling a ! will call inverse instead of not
+# because not is unsupported on ibis expression
+
+
+def not_operator(value):
+    if isinstance(value, ibis.expr.types.Expr):
+        return ~value
+    return not value
+
+
+def and_operator(l, r):
+    if isinstance(l, ibis.expr.types.Expr) or isinstance(r, ibis.expr.types.Expr):
+        return l & r
+    return l and r
+
+
+def or_operator(l, r):
+    if isinstance(l, ibis.expr.types.Expr) or isinstance(r, ibis.expr.types.Expr):
+        return l | r
+    return l or r
+
+
+# We also want to monkey patch `x == null` so that it resolves to `(x IS NULL)`, because
+# the null literal is not available for omnisci.
+
+
+def equal_operator(l, r):
+    if ibis.null().equals(l):
+        return r.isnull()
+    if ibis.null().equals(r):
+        return l.isnull()
+    return l == r
+
+
+# and the same for not equal
+def not_equal_operator(l, r):
+    return not_operator(equal_operator(l, r))
+
+
+altair_transform.utils._evaljs.UNARY_OPERATORS["!"] = not_operator
+altair_transform.utils._evaljs.BINARY_OPERATORS["&&"] = and_operator
+altair_transform.utils._evaljs.BINARY_OPERATORS["||"] = or_operator
+altair_transform.utils._evaljs.BINARY_OPERATORS["=="] = equal_operator
+altair_transform.utils._evaljs.BINARY_OPERATORS["==="] = equal_operator
+altair_transform.utils._evaljs.BINARY_OPERATORS["!="] = not_equal_operator
+altair_transform.utils._evaljs.BINARY_OPERATORS["!=="] = not_equal_operator
 
 
 def eval_vegajs(expression: str, datum: ibis.Expr = None) -> ibis.Expr:
@@ -366,7 +414,7 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     # Control Flow Functions
     "if": lambda test, true_expr, false_expr: ibis.ifelse(test, true_expr, false_expr),
     # Math Functions
-    "isNan": lambda x: x.isnull(),
+    "isNaN": lambda x: x.isnull(),
     "abs": ibis.expr.api.abs,
     "acos": ibis.expr.api.acos,
     "asin": ibis.expr.api.asin,
