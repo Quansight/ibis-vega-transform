@@ -27,7 +27,7 @@ def _aggregate(expr, field, op, name):
     return expr.name(name) if name else expr
 
 
-def _translate_op(op: str) -> str:
+def _translate_op(op: str):
     return {
         "count": ibis.expr.api.count,
         "distinct": ibis.expr.api.distinct,
