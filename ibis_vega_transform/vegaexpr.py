@@ -17,25 +17,27 @@ from typing_extensions import Literal
 from altair_transform.utils import evaljs
 import altair_transform.utils._evaljs
 
-# Monkey patch altair_transform so that evalling a ! will call inverse instead of not
-# because not is unsupported on ibis expression
-
+# Monkey patch altair_transform so that boolean operators  work on ibis expression
 
 def not_operator(value):
-    if isinstance(value, ibis.expr.types.Expr):
+    if isinstance(value, ibis.expr.types.ValueExpr):
         return ~value
     return not value
 
 
 def and_operator(l, r):
-    if isinstance(l, ibis.expr.types.Expr) or isinstance(r, ibis.expr.types.Expr):
-        return l & r
+    if isinstance(l, ibis.expr.types.ValueExpr):
+        if isinstance(r, ibis.expr.types.ValueExpr):
+            return l & r
+        return r and l
     return l and r
 
 
 def or_operator(l, r):
-    if isinstance(l, ibis.expr.types.Expr) or isinstance(r, ibis.expr.types.Expr):
-        return l | r
+    if isinstance(l, ibis.expr.types.ValueExpr):
+        if isinstance(r, ibis.expr.types.ValueExpr):
+            return l & r
+        return r or l
     return l or r
 
 
@@ -342,7 +344,7 @@ def _test_single_point(expr: ibis.Expr, field: FieldDict, value: Any) -> ibis.Ex
         return (lower <= column) & (column < upper)
     if tp == "R-LE":
         return (lower < column) & (column <= upper)
-    raise NotImplementedError(f"dont recoognize {tp}")
+    raise NotImplementedError(f"don't recoognize {tp}")
 
 
 def _test_point(expr: ibis.Expr, entry: SelectionDict) -> ibis.Expr:
