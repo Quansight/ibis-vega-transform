@@ -19,6 +19,7 @@ import altair_transform.utils._evaljs
 
 # Monkey patch altair_transform so that boolean operators  work on ibis expression
 
+
 def not_operator(value):
     if isinstance(value, ibis.expr.types.ValueExpr):
         return ~value
@@ -330,9 +331,20 @@ FieldDict = TypedDict(
 SelectionDict = TypedDict("SelectionDict", {"fields": List[FieldDict], "values": List})
 
 
+JS_DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+
 def _test_single_point(expr: ibis.Expr, field: FieldDict, value: Any) -> ibis.Expr:
     column = expr[field["field"]]
     tp = field["type"]
+
+    # SPECIAL CASE
+    # Workaround for case where we are selecting a range of dates
+    # for some reason this appears as type E even though it should be type R
+    if isinstance(column, ibis.expr.types.TemporalValue) and tp == "E":
+        tp = "R"
+        value = [dt.datetime.strptime(v, JS_DATETIME_FORMAT) for v in value]
+
     if tp == "E":
         if isinstance(value, list):
             return column.isin(value)
