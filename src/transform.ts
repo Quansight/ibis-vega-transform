@@ -4,8 +4,7 @@ import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
 
 import * as dataflow from 'vega-dataflow';
 
-import { Transform } from 'vega';
-
+import * as vega from 'vega';
 /**
  * Tries parsing all string values as dates.  Any that cannot be parsed are left alone
  *
@@ -35,7 +34,7 @@ function parseDates(o: { [key: string]: any }): { [key: string]: any } {
  * @param {object} params - The parameters for this operator.
  * @param {function(object): *} params.query - The SQL query.
  */
-class QueryIbis extends dataflow.Transform implements Transform {
+class QueryIbis extends dataflow.Transform implements vega.Transform {
   constructor(params: any) {
     super([], params);
   }
@@ -115,3 +114,6 @@ class QueryIbis extends dataflow.Transform implements Transform {
 }
 
 export default QueryIbis;
+
+// Get the vega singleton and add our custom transform to it.
+(vega as any).transforms[TRANSFORM] = QueryIbis;

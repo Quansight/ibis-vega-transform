@@ -1,46 +1,19 @@
-import {
-  JupyterFrontEnd,
-  JupyterFrontEndPlugin
-} from '@jupyterlab/application';
 import { DocumentRegistry } from '@jupyterlab/docregistry';
-import { INotebookTracker } from '@jupyterlab/notebook';
 import { IRenderMime } from '@jupyterlab/rendermime';
 import { Widget } from '@phosphor/widgets';
 
 import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 
-import ibisTransform from './ibis-transform';
-import { compileSpec } from './vega-compiler';
-const PLUGIN_ID = 'jupyterlab-omnisci:vega-ibis';
+import ibisTransform from './transform';
+import { compileSpec } from './compiler';
 
-const plugin: JupyterFrontEndPlugin<void> = {
-  activate,
-  id: PLUGIN_ID,
-  requires: [INotebookTracker],
-  autoStart: true
-};
-export default plugin;
 
 const MIMETYPE = 'application/vnd.vega.ibis.v5+json';
 
 const TRANSFORM = 'queryibis';
 
-function activate(_: JupyterFrontEnd, notebooks: INotebookTracker) {
-  notebooks.widgetAdded.connect((_, { context, content }) => {
-    content.rendermime.addFactory(
-      {
-        safe: true,
-        defaultRank: 50,
-        mimeTypes: [MIMETYPE],
-        createRenderer: () => new VegaIbisRenderer(context)
-      },
-      0
-    );
-  });
-}
-
-class VegaIbisRenderer extends Widget implements IRenderMime.IRenderer {
+export class VegaIbisRenderer extends Widget implements IRenderMime.IRenderer {
   constructor(
     private _context: DocumentRegistry.IContext<DocumentRegistry.IModel>
   ) {
@@ -83,5 +56,3 @@ class VegaIbisRenderer extends Widget implements IRenderMime.IRenderer {
   private _isDisposed = false;
   private _view: vega.View | null = null;
 }
-
-(vega as any).transforms[TRANSFORM] = ibisTransform;
