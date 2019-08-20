@@ -10,9 +10,7 @@ const TRANSFORM = 'queryibis';
 
 /**
  * Generates a function to query data from an OmniSci Core database.
- * @constructor
  * @param {object} params - The parameters for this operator.
- * @param {function(object): *} params.query - The SQL query.
  */
 class QueryIbis extends dataflow.Transform implements vega.Transform {
   constructor(params: any) {
