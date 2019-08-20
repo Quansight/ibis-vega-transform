@@ -50,13 +50,6 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
     ]
   };
 
-  get value(): any {
-    return this._value;
-  }
-  set value(val: any) {
-    this._value = val;
-  }
-
   async transform(parameters: any, pulse: any): Promise<any> {
     const kernel = QueryIbis.kernel;
     if (!kernel) {
