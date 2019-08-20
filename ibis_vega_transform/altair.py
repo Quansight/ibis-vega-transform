@@ -18,7 +18,6 @@ from ibis_vega_transform import apply
 
 __all__: typing.List[str] = []
 
-
 _expr_map: typing.Dict[str, ibis.Expr] = {}
 
 # New Vega Lite renderer mimetype which can process ibis expressions in names
@@ -132,7 +131,7 @@ def altair_renderer(spec):
 
 
 # For debugging
-_executed_expressions: typing.List[str] = []
+_executed_expressions = []
 _incoming_specs = []
 _outgoing_specs = []
 
@@ -336,5 +335,5 @@ altair.data_transformers.register("ibis", altair_data_transformer)
 altair.renderers.register("ibis", altair_renderer)
 get_ipython().kernel.comm_manager.register_target("queryibis", query_target_func)
 get_ipython().kernel.comm_manager.register_target(
-    "jupyterlab-omnisci:vega-compiler", compiler_target_function
+    "ibis-vega-transform:compiler", compiler_target_function
 )
