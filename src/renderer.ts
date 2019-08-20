@@ -25,7 +25,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
   ) {
     super();
   }
-  
+
   /**
    * Render vega data using the alternative renderer.
    */
