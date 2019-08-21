@@ -1,15 +1,9 @@
 import { DocumentRegistry } from '@jupyterlab/docregistry';
-
 import { IRenderMime } from '@jupyterlab/rendermime';
-
 import { Widget } from '@phosphor/widgets';
-
 import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
-
-import ibisTransform from './transform';
 import { compileSpec } from './compiler';
-
 import ibisTransform from './transform';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';

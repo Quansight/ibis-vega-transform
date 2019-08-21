@@ -1,7 +1,6 @@
 import { Kernel } from '@jupyterlab/services';
-
 import { PromiseDelegate } from '@phosphor/coreutils';
-import { compile, TopLevelSpec, extractTransforms, normalize } from 'vega-lite';
+import { compile, extractTransforms, normalize, TopLevelSpec } from 'vega-lite';
 import { initConfig } from 'vega-lite/build/src/config';
 
 const COMM_ID = 'ibis-vega-transform:compiler';

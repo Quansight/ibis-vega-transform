@@ -1,10 +1,7 @@
 import { Kernel } from '@jupyterlab/services';
-
 import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
-
-import * as dataflow from 'vega-dataflow';
-
 import * as vega from 'vega';
+import * as dataflow from 'vega-dataflow';
 
 /**
  * Tries parsing all string values as dates.  Any that cannot be parsed are left alone
@@ -28,7 +25,6 @@ function parseDates(o: { [key: string]: any }): { [key: string]: any } {
   }
   return n;
 }
-
 
 const TRANSFORM = 'queryibis';
 

@@ -20,10 +20,13 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "altair-transform",
+        "altair",
+        "vega_datasets",
         "ibis-framework",
         "mypy_extensions",
         "typing_extensions",
     ],
+    extras_require={"dev": ["black"]},
     python_requires=">=3.6",
     include_package_data=True,
 )
