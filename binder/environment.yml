@@ -1,0 +1,7 @@
+name: jupyterlab-omnisci
+channels:
+  - conda-forge
+dependencies:
+  - pymapd
+  - nodejs
+  - python>=3.7

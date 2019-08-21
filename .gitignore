@@ -9,3 +9,10 @@ __pycache__
 .vscode
 *.egg-info
 **/altair-data-*
+dist/*
+build/*
+tsconfig.tsbuildinfo
+lib/*
+node_modules/*
+**/.DS_Store
+**/.mypy_cache
