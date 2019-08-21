@@ -16,3 +16,5 @@ lib/*
 node_modules/*
 **/.DS_Store
 **/.mypy_cache
+*.db
+yarn-error.log

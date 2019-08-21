@@ -6,17 +6,17 @@ import json
 import re
 import typing
 import warnings
-import IPython
 
 import altair
 import altair.vegalite.v3.display
 import ibis
+import IPython
 import pandas
 from IPython import get_ipython
 
-from ibis_vega_transform import apply
+from .core import apply
 
-__all__: typing.List[str] = []
+__all__ = ["display_queries"]
 
 _expr_map: typing.Dict[str, ibis.Expr] = {}
 
@@ -138,14 +138,17 @@ _outgoing_specs = []
 
 d = None
 
+
 def display_queries():
     global d
-    d = IPython.display.display(IPython.display.Code(''), display_id=True)
+    d = IPython.display.display(IPython.display.Code(""), display_id=True)
     _update_display()
+
 
 def _update_display():
     if d:
-        d.update(IPython.display.Code('\n\n'.join(reversed(_executed_expressions))))
+        d.update(IPython.display.Code("\n\n".join(reversed(_executed_expressions))))
+
 
 def compiler_target_function(comm, msg):
     """
@@ -201,9 +204,12 @@ def query_target_func(comm, msg):
                 f"Failed to convert {transforms} with error message message '{e}'"
             )
     try:
-        _executed_expressions.append(expr.compile())
+        _executed_expressions.append(str(expr.compile()))
+        print(_executed_expressions)
     except ibis.common.UnsupportedOperationError:
-        raise NotImplementedError(f"Could not compile \n{expr}\n\ncreated from transforms:\n{transforms}")
+        raise NotImplementedError(
+            f"Could not compile \n{expr}\n\ncreated from transforms:\n{transforms}"
+        )
     _update_display()
 
     data = expr.execute()
@@ -333,6 +339,8 @@ def _cleanup_spec(spec):
 monkeypatch_altair()
 altair.data_transformers.register("ibis", altair_data_transformer)
 altair.renderers.register("ibis", altair_renderer)
+altair.renderers.enable('ibis')
+altair.data_transformers.enable('ibis')
 get_ipython().kernel.comm_manager.register_target("queryibis", query_target_func)
 get_ipython().kernel.comm_manager.register_target(
     "ibis-vega-transform:compiler", compiler_target_function

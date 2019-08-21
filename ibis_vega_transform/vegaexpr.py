@@ -2,20 +2,19 @@
 Evaluate vega expressions using ibis
 """
 import datetime as dt
+import functools
 import math
+import operator
 import random
 import sys
 from typing import *
-import functools
-import operator
 
+import altair_transform.utils._evaljs
 import ibis
 import ibis.expr.types as it
+from altair_transform.utils import evaljs
 from mypy_extensions import TypedDict
 from typing_extensions import Literal
-
-from altair_transform.utils import evaljs
-import altair_transform.utils._evaljs
 
 # Monkey patch altair_transform so that boolean operators  work on ibis expression
 
