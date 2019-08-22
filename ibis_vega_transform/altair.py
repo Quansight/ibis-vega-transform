@@ -284,6 +284,15 @@ def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.An
                 del data["source"]
                 source_transforms = _transforms.get(source, [])
                 old_transforms = data.get("transform", [])
+
+                # Rename "signal" to "signal_" because if vega
+                # sees a "signal" key on an object it will try to resolve it, instead of passing
+                # it into the transform
+                for t in old_transforms:
+                    if "signal" in t:
+                        t['signal_'] = t['signal']
+                        del t['signal']
+
                 new_transforms = source_transforms + old_transforms
                 data["transform"] = [
                     {

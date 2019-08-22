@@ -28,7 +28,29 @@ def apply(expr: ibis.Expr, transforms: Any) -> ibis.Expr:
         return expr
     transforms = promote_list(transforms)
 
+    # First traverse list of transforms, and find any that create bins
+    # The resulting bin fields, we create as the source fields,
+    # Because, for some reason, the filter happens before
+    # the binning, but it refers to the field created by the binning
+    # See the signals in https://vega.github.io/editor/#/gist/9c7d4dee819450e59cf7381f4d47fee0/example.vl.json
+    # as an example
+    # TODO: Bring this up with Dominik and see why this is
     for t in transforms:
+        if t["type"] == "bin":
+            expr = expr.mutate(expr[t["field"]].name(t["as"][0]))
+
+    # Have extra processing for extents that create signals
+    # can probably remove once https://github.com/vega/vega-lite/issues/5320 is fixed.
+    signal_mapping = {}
+
+    for t in transforms:
+        if t["type"] == "extent":
+            assert {"field", "signal_", "type"} == t.keys()
+            signal_mapping[t["signal_"]] = t["field"]
+            continue
+        # Change binning that reference  signal extent with actual value
+        if "extent" in t and "signal" in t["extent"]:
+            t["extent"] = signal_mapping.pop(t["extent"]["signal"])
         expr = _delegate_transform(t, expr)
     return expr
 
