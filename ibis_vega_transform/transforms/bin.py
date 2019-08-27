@@ -38,13 +38,14 @@ def bin(transform: BinTransform, expr: ibis.Expr) -> ibis.Expr:
     # errors
     min_ = extent.min().execute()
     max_ = extent.max().execute()
-    # Case these to floats to work around
-    # https://github.com/ibis-project/ibis/issues/1934
-    binwidth = _cast_float(max_ - min_) / maxbins
 
-    bin_ = ((field - _cast_float(min_)) / binwidth).floor()
-    left = (_cast_float(min_) + (bin_ * binwidth)).name(as_left)
-    right = (left + binwidth).name(as_right)
+    # Cast these to floats to work around
+    # https://github.com/ibis-project/ibis/issues/1934
+    binwidth = (max_ - min_) / maxbins
+
+    bin_ = (((field / _float(binwidth)) - _float(min_ / binwidth))).floor()
+    left = (min_ + (bin_ * binwidth)).name(as_left)
+    right = (((min_ + binwidth) + (bin_ * binwidth))).name(as_right)
 
     # raise ''
     # add the two new fields and remove the initial column
@@ -54,5 +55,5 @@ def bin(transform: BinTransform, expr: ibis.Expr) -> ibis.Expr:
     )
 
 
-def _cast_float(value) -> ibis.Expr:
+def _float(value) -> ibis.Expr:
     return ibis.literal(value, "float64").cast("float32")
