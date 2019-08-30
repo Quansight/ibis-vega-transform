@@ -31,5 +31,7 @@ export async function compileSpec(
   const comm = kernel.connectToComm(COMM_ID);
   comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
   await comm.open(vSpec as any).done;
-  return transformedSpecPromise.promise;
+  const finalSpec = await transformedSpecPromise.promise;
+  console.log('Final Vega Spec', finalSpec);
+  return finalSpec;
 }
