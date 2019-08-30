@@ -66,3 +66,60 @@ To format all the files:
 black ibis_vega_transform
 jlpm run prettier
 ```
+
+
+## Releasing
+
+First create a test environment:
+
+```bash
+conda create -n tmp -c conda-forge nodejs
+conda activate tmp
+```
+
+Then bump the Python version in `setup.py` and upload a test version:
+
+```bash
+pip install --upgrade setuptools wheel twine
+rm -rf dist/
+python setup.py sdist bdist_wheel
+twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+```
+
+Install the test version in your new environment:
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple ibis-vega-transform
+```
+
+Now bump the version for the Javascript package in `package.json`. The run a build,
+create a tarball, and install it as a JupyterLab extension:
+
+```bash
+yarn run build
+yarn pack --filename out.tgz
+jupyter labextension install out.tgz
+```
+
+Now open JupyterLab and run through all the notebooks in `examples` to make sure
+they still render correctly.
+
+Now you can publish the Python package:
+
+```bash
+twine upload dist/*
+```
+
+And publish the node package:
+
+```bash
+npm publish out.tgz
+```
+
+And add a git tag for the release and push:
+
+```bash
+git tag <new version>
+git push
+git push --tags
+```
