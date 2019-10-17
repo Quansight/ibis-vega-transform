@@ -18,7 +18,8 @@
     "strict": true,
     "strictNullChecks": false,
     "target": "es2017",
-    "types": []
+    "types": [],
+    "lib": ["dom", "esnext", "esnext.asynciterable"]
   },
   "include": ["src/*"]
 }

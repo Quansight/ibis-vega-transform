@@ -3,6 +3,7 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { INotebookTracker } from '@jupyterlab/notebook';
+import { TVoilaTracker } from 'phoila/lib/tokens';
 import { IbisVegaRenderer, MIME_TYPE } from './renderer';
 
 /**
@@ -16,7 +17,7 @@ const PLUGIN_ID = 'ibis-vega-transform:plugin';
 const plugin: JupyterFrontEndPlugin<void> = {
   activate,
   id: PLUGIN_ID,
-  requires: [INotebookTracker],
+  optional: [INotebookTracker, TVoilaTracker],
   autoStart: true
 };
 
@@ -25,18 +26,30 @@ const plugin: JupyterFrontEndPlugin<void> = {
  * rendermime registries that knows how to lazily fetch ibis transforms
  * from the server.
  */
-function activate(_: JupyterFrontEnd, notebooks: INotebookTracker) {
-  notebooks.widgetAdded.connect((_, { context, content }) => {
-    content.rendermime.addFactory(
-      {
-        safe: true,
-        defaultRank: 50,
-        mimeTypes: [MIME_TYPE],
-        createRenderer: () => new IbisVegaRenderer(context)
-      },
-      0
-    );
-  });
+function activate(
+  _: JupyterFrontEnd,
+  notebooks: INotebookTracker | null,
+  voila: TVoilaTracker | null
+) {
+  console.log(notebooks, voila);
+  if (voila) {
+    voila.widgetAdded.connect((_, widget) => {
+      console.log(widget);
+    });
+  }
+  if (notebooks) {
+    notebooks.widgetAdded.connect((_, { context, content }) => {
+      content.rendermime.addFactory(
+        {
+          safe: true,
+          defaultRank: 50,
+          mimeTypes: [MIME_TYPE],
+          createRenderer: () => new IbisVegaRenderer(context)
+        },
+        0
+      );
+    });
+  }
 }
 
 export default plugin;
