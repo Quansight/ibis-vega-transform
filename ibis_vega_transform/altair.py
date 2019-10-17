@@ -12,6 +12,7 @@ import altair.vegalite.v3.display
 import ibis
 import IPython
 import pandas
+import jaeger_client
 from IPython import get_ipython
 
 from .core import apply
@@ -19,6 +20,7 @@ from .core import apply
 __all__ = ["display_queries"]
 
 _expr_map: typing.Dict[str, ibis.Expr] = {}
+_root_span_map: typing.Dict[str, jaeger_client.Span] = {}
 
 # New Vega Lite renderer mimetype which can process ibis expressions in names
 MIMETYPE = "application/vnd.vega.ibis.v5+json"
@@ -39,6 +41,15 @@ EMPTY_VEGA = {
     "legends": [],
     "marks": [],
 }
+
+
+def init_jaeger_tracer(service_name="ibis_vega_transform"):
+    config = jaeger_client.Config(
+        config={"sampler": {"type": "const", "param": 1}, "logging": True},
+        service_name=service_name,
+        validate=True,
+    )
+    return config.initialize_tracer()
 
 
 def empty_dataframe(expr: ibis.Expr) -> pandas.DataFrame:
@@ -88,6 +99,11 @@ DATA_NAME_PREFIX = "ibis:"
 FALLBACK = False
 
 
+# Set this to the active span when creating the altair chart, so that
+# all hashes of ibis expressions point to this active scan
+ACTIVE_SPAN = None
+
+
 def altair_data_transformer(data):
     """
     turn a pandas DF with the Ibis query that made it attached to it into
@@ -95,13 +111,20 @@ def altair_data_transformer(data):
     (because of how Altair is set up), we create a unique name and
     save the ibis expression globally with that name so we can pick it up later.
     """
+    global ACTIVE_SPAN
     assert isinstance(data, pandas.DataFrame)
     expr = data.ibis
+
     if FALLBACK:
         return altair.default_data_transformer(expr.limit(1000).execute())
+
+    if not ACTIVE_SPAN:
+        ACTIVE_SPAN = tracer.start_span("chart")
+
     h = str(hash(expr))
     name = f"{DATA_NAME_PREFIX}{h}"
     _expr_map[h] = expr
+    _root_span_map[h] = ACTIVE_SPAN
     return {"name": name}
 
 
@@ -125,8 +148,12 @@ def altair_renderer(spec):
     """
     An altair renderer that serves our custom mimetype with ibis support.
     """
+    global ACTIVE_SPAN
     if FALLBACK:
         return altair.vegalite.v3.display.default_renderer(spec)
+
+    # Reset active span so when new chart renders, it will have its own
+    ACTIVE_SPAN = None
     return {MIMETYPE: spec}
 
 
@@ -159,15 +186,18 @@ def compiler_target_function(comm, msg):
     spec = msg["content"]["data"]
     _incoming_specs.append(spec)
     try:
-        updated_spec = _transform(spec)
+        root_span, span, updated_spec = _transform(spec)
         _outgoing_specs.append(updated_spec)
         comm.send(updated_spec)
-    except ValueError:
+        span.finish()
+        root_span.finish()
+    except ValueError as e:
         # If there was an error transforming the spec, which can happen
         # if we don't support all the required transforms, or if
         # the spec references an old, unavailable ibis expression,
         # then send an empty vega spec.
         comm.send(EMPTY_VEGA)
+        raise e
 
 
 def query_target_func(comm, msg):
@@ -242,7 +272,9 @@ assert _extract_used_data(
 ) == {"Filter_store"}
 
 
-def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+def _transform(
+    spec: typing.Dict[str, typing.Any]
+) -> typing.Tuple[jaeger_client.Span, jaeger_client.Span, typing.Dict[str, typing.Any]]:
     """
     Transform a vega spec into one that uses the `queryibis` transform
     in the place of vega transforms.
@@ -257,13 +289,31 @@ def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.An
     # the entire set of data without encountering one,
     # then we are done.
     done = False
+    root_span: typing.Optional[jaeger_client.Span] = None
+    span: typing.Optional[jaeger_client.Span] = None
+
+    def set_span(key: typing.Optional[str]) -> typing.Optional[str]:
+        nonlocal root_span
+        nonlocal span
+
+        if not key:
+            return None
+        if not root_span:
+            root_span = _root_span_map[key]
+        else:
+            # Verify all data points to same root span
+            assert root_span == _root_span_map[key]
+        if not span:
+            span = tracer.start_span("transform_vega_spec", child_of=root_span)
+        return key
+
     while not done:
         for data in new["data"]:
             # First check for named data which matches an initial
             # ibis expression passed in directly via altair.
             name = data.get("name", "")
             if _is_ibis(name) and name not in _root_expressions:
-                key = _retrieve_expr_key(name)
+                key = set_span(_retrieve_expr_key(name))
                 new_transform = {"type": "queryibis", "name": key}
                 # If the named data has transforms, set them
                 # in the ibis transform, and keep a reference
@@ -290,14 +340,14 @@ def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.An
                 # it into the transform
                 for t in old_transforms:
                     if "signal" in t:
-                        t['signal_'] = t['signal']
-                        del t['signal']
+                        t["signal_"] = t["signal"]
+                        del t["signal"]
 
                 new_transforms = source_transforms + old_transforms
                 data["transform"] = [
                     {
                         "type": "queryibis",
-                        "name": _retrieve_expr_key(_root_expressions[source]),
+                        "name": set_span(_retrieve_expr_key(_root_expressions[source])),
                         "data": "{"
                         + ", ".join(
                             f"{field}: data('{field}')"
@@ -316,7 +366,7 @@ def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.An
         else:
             done = True
 
-    return _cleanup_spec(new)
+    return (root_span, span, _cleanup_spec(new))
 
 
 def _cleanup_spec(spec):
@@ -348,9 +398,10 @@ def _cleanup_spec(spec):
 monkeypatch_altair()
 altair.data_transformers.register("ibis", altair_data_transformer)
 altair.renderers.register("ibis", altair_renderer)
-altair.renderers.enable('ibis')
-altair.data_transformers.enable('ibis')
+altair.renderers.enable("ibis")
+altair.data_transformers.enable("ibis")
 get_ipython().kernel.comm_manager.register_target("queryibis", query_target_func)
 get_ipython().kernel.comm_manager.register_target(
     "ibis-vega-transform:compiler", compiler_target_function
 )
+tracer = init_jaeger_tracer()

@@ -44,6 +44,9 @@ some options using interactive charts and the OmniSci backend.
 
 To install from source, run the following in a terminal:
 
+
+
+
 ```bash
 git clone git@github.com:Quansight/ibis-vega-transform.git
 
@@ -67,6 +70,12 @@ black ibis_vega_transform
 jlpm run prettier
 ```
 
+
+### Tracing
+
+1. Install [Jaeger binary](https://www.jaegertracing.io/download/)
+2. `jaeger-all-in-one`
+3. `open http://localhost:16686/`
 
 ## Releasing
 
