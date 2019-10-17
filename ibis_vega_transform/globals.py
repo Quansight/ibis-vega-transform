@@ -7,8 +7,6 @@ __all__ = [
     "DATA_NAME_PREFIX",
     "get_fallback",
     "set_fallback",
-    "get_active_span",
-    "set_active_span",
 ]
 
 _expr_map: typing.Dict[str, ibis.Expr] = {}
@@ -28,15 +26,3 @@ def set_fallback(fallback: bool) -> None:
 
 def get_fallback() -> bool:
     return FALLBACK
-
-
-active_span: typing.Optional[opentracing.Span] = None
-
-
-def set_active_span(scan: typing.Optional[opentracing.Span]) -> None:
-    global active_span
-    active_span = scan
-
-
-def get_active_span() -> typing.Optional[opentracing.Span]:
-    return active_span

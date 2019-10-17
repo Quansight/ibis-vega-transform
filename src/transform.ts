@@ -34,6 +34,7 @@ const TRANSFORM = 'queryibis';
  */
 class QueryIbis extends dataflow.Transform implements vega.Transform {
   constructor(params: any) {
+    console.log(params);
     super([], params);
   }
 
@@ -78,6 +79,7 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
   }
 
   async transform(parameters: any, pulse: any): Promise<any> {
+    console.log({ parameters, pulse });
     const kernel = QueryIbis.kernel;
     if (!kernel) {
       console.error('Not connected to kernel');

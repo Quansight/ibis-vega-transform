@@ -3,8 +3,7 @@ import typing
 import altair
 
 from .tracing import tracer
-from .globals import get_fallback, DATA_NAME_PREFIX, _expr_map, get_active_span, set_active_span
-
+from .globals import get_fallback, DATA_NAME_PREFIX, _expr_map
 
 __all__: typing.List[str] = []
 
@@ -22,13 +21,14 @@ def altair_data_transformer(data):
     if get_fallback():
         return altair.default_data_transformer(expr.limit(1000).execute())
     # Start a span during the first data transform
-    if not get_active_span():
-        set_active_span(tracer.start_span("altair"))
+    if not tracer.active_span or tracer.active_span.finished:
+        tracer.start_active_span("altair")
 
-    h = str(hash(expr))
-    name = f"{DATA_NAME_PREFIX}{h}"
-    _expr_map[h] = expr
-    return {"name": name}
+    with tracer.start_span("altair_data_transformer"):
+        h = str(hash(expr))
+        name = f"{DATA_NAME_PREFIX}{h}"
+        _expr_map[h] = expr
+        return {"name": name}
 
 
 altair.data_transformers.register("ibis", altair_data_transformer)
