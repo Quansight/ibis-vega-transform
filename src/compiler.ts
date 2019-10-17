@@ -11,7 +11,8 @@ const COMM_ID = 'ibis-vega-transform:compiler';
  */
 export async function compileSpec(
   kernel: Kernel.IKernelConnection,
-  vlSpec: TopLevelSpec
+  vlSpec: TopLevelSpec,
+  span: any
 ): Promise<object> {
   // uses same logic as
   // https://github.com/vega/vega-lite/blob/a4ee4ec393d86b611f95486ad2e1902bfa3ed0cf/test/transformextract.test.ts#L133
@@ -30,7 +31,7 @@ export async function compileSpec(
   const transformedSpecPromise = new PromiseDelegate<any>();
   const comm = kernel.connectToComm(COMM_ID);
   comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
-  await comm.open(vSpec as any).done;
+  await comm.open({ spec: vSpec, span: span } as any).done;
   const finalSpec = await transformedSpecPromise.promise;
   console.log('Final Vega Spec', finalSpec);
   return finalSpec;
