@@ -67,7 +67,8 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
     const vSpec = await compileSpec(
       kernel,
       vlSpec,
-      await injectSpan(compileSpecSpan)
+      await injectSpan(compileSpecSpan),
+      injectedSpan
     );
 
     await finishSpan(compileSpecSpan);

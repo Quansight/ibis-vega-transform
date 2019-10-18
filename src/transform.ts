@@ -2,6 +2,7 @@ import { Kernel } from '@jupyterlab/services';
 import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
 import * as vega from 'vega';
 import * as dataflow from 'vega-dataflow';
+import { startSpanExtract, finishSpan } from './tracing';
 
 /**
  * Tries parsing all string values as dates.  Any that cannot be parsed are left alone
@@ -67,6 +68,11 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
         type: 'transform',
         array: true,
         required: false
+      },
+      {
+        name: 'span',
+        type: 'object',
+        required: false
       }
     ]
   };
@@ -80,6 +86,13 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
 
   async transform(parameters: any, pulse: any): Promise<any> {
     console.log({ parameters, pulse });
+
+    const spanExtract = await startSpanExtract({
+      name: 'transform',
+      relationship: 'follows_from',
+      reference: parameters.span
+    });
+
     const kernel = QueryIbis.kernel;
     if (!kernel) {
       console.error('Not connected to kernel');
@@ -107,6 +120,7 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
     out.rem = this._value;
     this._value = out.add = out.source = parsedResult;
 
+    await finishSpan(spanExtract);
     return out;
   }
 

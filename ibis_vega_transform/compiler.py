@@ -40,6 +40,7 @@ def compiler_target_function(comm, msg):
     data = msg["content"]["data"]
     spec = data["spec"]
     injected_span = data["span"]
+    root_span = data["rootSpan"]
 
     root_ref = opentracing.child_of(
         (tracer.extract(opentracing.Format.TEXT_MAP, injected_span))
@@ -49,10 +50,9 @@ def compiler_target_function(comm, msg):
         _incoming_specs.append(spec)
         try:
             with tracer.start_span("transform-vega", child_of=span):
-                updated_spec = _transform(spec)
+                updated_spec = _transform(spec, root_span)
             _outgoing_specs.append(updated_spec)
-            with tracer.start_span("comm-send", child_of=span):
-                comm.send(updated_spec)
+            comm.send(updated_spec)
         except ValueError as e:
             # If there was an error transforming the spec, which can happen
             # if we don't support all the required transforms, or if
@@ -62,7 +62,9 @@ def compiler_target_function(comm, msg):
             raise e
 
 
-def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.Any]:
+def _transform(
+    spec: typing.Dict[str, typing.Any], root_span: object
+) -> typing.Dict[str, typing.Any]:
     """
     Transform a vega spec into one that uses the `queryibis` transform
     in the place of vega transforms.
@@ -84,7 +86,7 @@ def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.An
             name = data.get("name", "")
             if _is_ibis(name) and name not in _root_expressions:
                 key = _retrieve_expr_key(name)
-                new_transform = {"type": "queryibis", "name": key}
+                new_transform = {"type": "queryibis", "name": key, "span": root_span}
                 # If the named data has transforms, set them
                 # in the ibis transform, and keep a reference
                 # to them in case we need to incorporate them
@@ -118,6 +120,7 @@ def _transform(spec: typing.Dict[str, typing.Any]) -> typing.Dict[str, typing.An
                     {
                         "type": "queryibis",
                         "name": _retrieve_expr_key(_root_expressions[source]),
+                        "span": root_span,
                         "data": "{"
                         + ", ".join(
                             f"{field}: data('{field}')"
