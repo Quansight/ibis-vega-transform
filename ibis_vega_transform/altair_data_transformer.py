@@ -31,11 +31,10 @@ def altair_data_transformer(data):
     if not get_active_span():
         set_active_span(tracer.start_span("altair"))
 
-    with tracer.start_span("altair_data_transformer", child_of=get_active_span()):
-        h = str(hash(expr))
-        name = f"{DATA_NAME_PREFIX}{h}"
-        _expr_map[h] = expr
-        return {"name": name}
+    h = str(hash(expr))
+    name = f"{DATA_NAME_PREFIX}{h}"
+    _expr_map[h] = expr
+    return {"name": name}
 
 
 altair.data_transformers.register("ibis", altair_data_transformer)
