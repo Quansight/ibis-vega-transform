@@ -7,32 +7,14 @@ import typing
 
 import altair
 import altair.vegalite.v3.display
-import ibis
-import IPython
-from IPython import get_ipython
 import opentracing
+from IPython import get_ipython
 
 from .core import apply
 from .globals import _expr_map
 from .tracer import tracer
-__all__ = ["display_queries"]
 
-
-# For debugging
-_executed_expressions: typing.List[str] = []
-
-d = None
-
-
-def display_queries():
-    global d
-    d = IPython.display.display(IPython.display.Code(""), display_id=True)
-    _update_display()
-
-
-def _update_display():
-    if d:
-        d.update(IPython.display.Code("\n\n".join(reversed(_executed_expressions))))
+__all__: typing.List[str] = []
 
 
 def query_target_func(comm, msg):
@@ -46,12 +28,18 @@ def query_target_func(comm, msg):
     transforms: typing.Optional[str] = parameters.pop("transform", None)
     injected_span: object = parameters.pop("span")
 
-    with tracer.start_span("queryibis", references=[opentracing.child_of(
-        (tracer.extract(opentracing.Format.TEXT_MAP, injected_span))
-    )]) as span:
+    with tracer.start_span(
+        "queryibis",
+        references=[
+            opentracing.child_of(
+                (tracer.extract(opentracing.Format.TEXT_MAP, injected_span))
+            )
+        ],
+    ) as span:
         if name not in _expr_map:
             raise ValueError(f"{name} is not an expression known to us!")
         expr = _expr_map[name]
+        span.log_kv({"sql:initial": expr.compile(), "transforms": transforms})
         if transforms:
             # Replace all string instances of data references with value in schema
             for k, v in parameters.items():
@@ -72,15 +60,8 @@ def query_target_func(comm, msg):
                 raise ValueError(
                     f"Failed to convert {transforms} with error message message '{e}'"
                 )
-        try:
-            _executed_expressions.append(str(expr.compile()))
-            print(_executed_expressions)
-        except ibis.common.UnsupportedOperationError:
-            raise NotImplementedError(
-                f"Could not compile \n{expr}\n\ncreated from transforms:\n{transforms}"
-            )
-        _update_display()
-        with tracer.start_span("ibis:execute", child_of=span):
+        with tracer.start_span("ibis:execute", child_of=span) as execute_span:
+            execute_span.log_kv({"sql": expr.compile()})
             data = expr.execute()
         comm.send(altair.to_values(data)["values"])
 

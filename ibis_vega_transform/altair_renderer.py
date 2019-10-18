@@ -22,6 +22,8 @@ def altair_renderer(spec):
     active_span = get_active_span()
     injected_span = {}
     tracer.inject(active_span, opentracing.Format.TEXT_MAP, injected_span)
+    get_active_span().log_kv({"vega-lite:initial": spec})
+
     active_span.finish()
     set_active_span(None)
     return {MIMETYPE: {"spec": spec, "span": injected_span}}

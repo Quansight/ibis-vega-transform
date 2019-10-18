@@ -19,14 +19,12 @@ export async function compileSpec(
   // https://github.com/vega/vega-lite/blob/a4ee4ec393d86b611f95486ad2e1902bfa3ed0cf/test/transformextract.test.ts#L133
 
   const config = initConfig(vlSpec.config || {});
-  console.log('Initial VegaLite Spec', vlSpec);
   const extractSpec = extractTransforms(
     normalize(vlSpec as any, config),
     config
   );
-  console.log('Extracted VegaLite Spec', extractSpec);
+  // TODO: Log extracted vl spec
   const vSpec = compile(extractSpec as any, { config }).spec;
-  console.log('Initial Vega Spec', vSpec);
 
   // Change vega transforms to ibis transforms on the server side.
   const transformedSpecPromise = new PromiseDelegate<any>();
@@ -34,6 +32,5 @@ export async function compileSpec(
   comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
   await comm.open({ spec: vSpec, span: span, rootSpan } as any).done;
   const finalSpec = await transformedSpecPromise.promise;
-  console.log('Final Vega Spec', finalSpec);
   return finalSpec;
 }

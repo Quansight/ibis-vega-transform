@@ -85,7 +85,6 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
   }
 
   async transform(parameters: any, pulse: any): Promise<any> {
-    console.log({ parameters, pulse });
 
     const spanExtract = await startSpanExtract({
       name: 'transform',
@@ -114,16 +113,13 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
 
     // set span inside comm to be this comm message instead of root span
     parameters.span = await injectSpan(commSpan);
-    console.log('Fetching data', parameters);
 
     await comm.open(parameters).done;
     const result: JSONObject[] = await resultPromise.promise;
 
     await finishSpan(commSpan);
 
-    console.log('Received data', result);
     const parsedResult = result.map(parseDates);
-    console.log('Parsed data', parsedResult);
 
     // Ingest the data and push it into the dataflow graph.
     parsedResult.forEach(dataflow.ingest);

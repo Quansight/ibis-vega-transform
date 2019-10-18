@@ -27,9 +27,6 @@ EMPTY_VEGA = {
     "marks": [],
 }
 
-_incoming_specs = []
-_outgoing_specs = []
-
 
 def compiler_target_function(comm, msg):
     """
@@ -47,11 +44,13 @@ def compiler_target_function(comm, msg):
     )
 
     with tracer.start_span("compile-vega", references=root_ref) as span:
-        _incoming_specs.append(spec)
+        span.log_kv({"vega-spec:initial": spec})
+
         try:
-            with tracer.start_span("transform-vega", child_of=span):
+            with tracer.start_span("transform-vega", child_of=span) as transform_span:
                 updated_spec = _transform(spec, root_span)
-            _outgoing_specs.append(updated_spec)
+                transform_span.log_kv({"vega-spec:transformed": updated_spec})
+
             comm.send(updated_spec)
         except ValueError as e:
             # If there was an error transforming the spec, which can happen
