@@ -2,7 +2,7 @@ import { Kernel } from '@jupyterlab/services';
 import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
 import * as vega from 'vega';
 import * as dataflow from 'vega-dataflow';
-import { startSpanExtract, finishSpan } from './tracing';
+import { startSpanExtract, finishSpan, startSpan, injectSpan } from './tracing';
 
 /**
  * Tries parsing all string values as dates.  Any that cannot be parsed are left alone
@@ -99,15 +99,28 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
       return;
     }
 
+    const commSpan = await startSpan({
+      name: 'comm:queryibis',
+      reference: spanExtract,
+      relationship: 'child_of'
+    });
+
     // Fetch the query results from the kernel.
     const comm = kernel.connectToComm('queryibis');
+
     const resultPromise = new PromiseDelegate<JSONObject[]>();
     comm.onMsg = msg =>
       resultPromise.resolve((msg.content.data as any) as JSONObject[]);
 
+    // set span inside comm to be this comm message instead of root span
+    parameters.span = await injectSpan(commSpan);
     console.log('Fetching data', parameters);
+
     await comm.open(parameters).done;
     const result: JSONObject[] = await resultPromise.promise;
+
+    await finishSpan(commSpan);
+
     console.log('Received data', result);
     const parsedResult = result.map(parseDates);
     console.log('Parsed data', parsedResult);
