@@ -5,6 +5,8 @@ import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
 import ibisTransform from './transform';
+import { tracer } from './tracing';
+import { FORMAT_TEXT_MAP, followsFrom } from 'opentracing';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';
 
@@ -26,7 +28,15 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
    * Render vega data using the alternative renderer.
    */
   async renderModel(model: IRenderMime.IMimeModel): Promise<void> {
-    const {spec: vlSpec, span} = model.data[MIME_TYPE] as {spec: any, span: any};
+    const { spec: vlSpec, span: injectedSpan } = model.data[MIME_TYPE] as {
+      spec: any;
+      span: any;
+    };
+
+    const rootSpanContext = tracer.extract(FORMAT_TEXT_MAP, injectedSpan);
+    const renderModelSpan = tracer.startSpan('renderModel', {
+      references: [followsFrom(rootSpanContext)]
+    });
     const kernel = this._context.session.kernel;
 
     if (kernel === null) {
@@ -49,7 +59,13 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       this._view = null;
     }
 
-    const vSpec = await compileSpec(kernel, vlSpec, span);
+    const injectedRenderModelSpan = {};
+    tracer.inject(
+      renderModelSpan.context(),
+      FORMAT_TEXT_MAP,
+      injectedRenderModelSpan
+    );
+    const vSpec = await compileSpec(kernel, vlSpec, injectedRenderModelSpan);
 
     // TODO: is this safe if there are multiple kernels trying to use
     // the transform? Can we construct individual transforms/comms for
@@ -63,6 +79,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
     this._view = res.view;
     this._renderingSpec = false;
     this._renderedSpec = vlSpec;
+    renderModelSpan.finish();
   }
 
   /**
