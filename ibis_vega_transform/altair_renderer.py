@@ -4,7 +4,7 @@ import altair
 import opentracing
 
 from .tracing import tracer
-from .globals import get_fallback
+from .globals import get_fallback, set_active_span, get_active_span
 
 __all__: typing.List[str] = []
 
@@ -19,10 +19,11 @@ def altair_renderer(spec):
     if get_fallback():
         return altair.vegalite.v3.display.default_renderer(spec)
 
-    active_span = tracer.active_span
+    active_span = get_active_span()
     injected_span = {}
     tracer.inject(active_span, opentracing.Format.TEXT_MAP, injected_span)
     active_span.finish()
+    set_active_span(None)
     return {MIMETYPE: {"spec": spec, "span": injected_span}}
 
 
