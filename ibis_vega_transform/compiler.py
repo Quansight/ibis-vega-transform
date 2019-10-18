@@ -1,13 +1,12 @@
-import typing
 import copy
 import re
-import opentracing
+import typing
 
+import opentracing
 from IPython import get_ipython
 
-from .tracing import tracer
 from .globals import DATA_NAME_PREFIX, _expr_map
-
+from .tracer import tracer
 
 __all__ = ["_incoming_specs", "_outgoing_specs"]
 

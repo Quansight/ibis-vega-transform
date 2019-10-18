@@ -75,7 +75,9 @@ jlpm run prettier
 
 1. Install [Jaeger binary](https://www.jaegertracing.io/download/)
 2. `jaeger-all-in-one`
-3. `open http://localhost:16686/`
+3. `env JAEGER_SERVICE_NAME=browser python -m ibis_vega_transform.tracing_server`
+4. `open http://localhost:16686/`
+5. Display charts and look at traces
 
 ## Releasing
 

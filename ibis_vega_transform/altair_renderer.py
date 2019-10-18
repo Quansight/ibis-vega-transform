@@ -3,8 +3,8 @@ import typing
 import altair
 import opentracing
 
-from .tracing import tracer
-from .globals import get_fallback, set_active_span, get_active_span
+from .globals import get_active_span, get_fallback, set_active_span
+from .tracer import tracer
 
 __all__: typing.List[str] = []
 

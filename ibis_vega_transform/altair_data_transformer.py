@@ -1,16 +1,17 @@
-import pandas
 import typing
-import altair
 
-from .tracing import tracer
+import altair
+import pandas
+from opentracing import tags
+
 from .globals import (
-    get_fallback,
     DATA_NAME_PREFIX,
     _expr_map,
     get_active_span,
+    get_fallback,
     set_active_span,
 )
-
+from .tracer import tracer
 
 __all__: typing.List[str] = []
 
@@ -29,7 +30,7 @@ def altair_data_transformer(data):
         return altair.default_data_transformer(expr.limit(1000).execute())
     # Start a span during the first data transform
     if not get_active_span():
-        set_active_span(tracer.start_span("altair"))
+        set_active_span(tracer.start_span("altair", tags={tags.SERVICE: "kernel"}))
 
     h = str(hash(expr))
     name = f"{DATA_NAME_PREFIX}{h}"

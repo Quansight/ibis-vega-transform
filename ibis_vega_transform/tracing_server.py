@@ -1,14 +1,21 @@
+"""
+Python HTTP server to record traces from the browser.
+
+We won't need this anymore once jaeger supports clien side reporting.
+"""
+
 import typing
 
 import opentracing
 import uvicorn
 from mypy_extensions import TypedDict
 from starlette.applications import Starlette
+from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 from typing_extensions import Literal
-from starlette.exceptions import HTTPException
-from .tracing import tracer
+
+from .tracer import tracer
 
 app = Starlette(debug=True)
 app.add_middleware(
