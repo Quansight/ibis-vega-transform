@@ -5,8 +5,7 @@ import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
 import ibisTransform from './transform';
-import { tracer } from './tracing';
-import { FORMAT_TEXT_MAP, followsFrom } from 'opentracing';
+import { startSpanExtract, finishSpan, injectSpan, startSpan } from './tracing';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';
 
@@ -30,12 +29,12 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
   async renderModel(model: IRenderMime.IMimeModel): Promise<void> {
     const { spec: vlSpec, span: injectedSpan } = model.data[MIME_TYPE] as {
       spec: any;
-      span: any;
+      span: object;
     };
-
-    const rootSpanContext = tracer.extract(FORMAT_TEXT_MAP, injectedSpan);
-    const renderModelSpan = tracer.startSpan('renderModel', {
-      references: [followsFrom(rootSpanContext)]
+    const renderModelSpan = await startSpanExtract({
+      name: 'renderModel',
+      reference: injectedSpan,
+      relationship: 'follows_from'
     });
     const kernel = this._context.session.kernel;
 
@@ -59,13 +58,25 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       this._view = null;
     }
 
-    const injectedRenderModelSpan = {};
-    tracer.inject(
-      renderModelSpan.context(),
-      FORMAT_TEXT_MAP,
-      injectedRenderModelSpan
+    const compileSpecSpan = await startSpan({
+      name: 'compileSpec',
+      reference: renderModelSpan,
+      relationship: 'child_of'
+    });
+
+    const vSpec = await compileSpec(
+      kernel,
+      vlSpec,
+      await injectSpan(compileSpecSpan)
     );
-    const vSpec = await compileSpec(kernel, vlSpec, injectedRenderModelSpan);
+
+    await finishSpan(compileSpecSpan);
+
+    const vegaEmbedSpan = await startSpan({
+      name: 'vegaEmbed',
+      reference: renderModelSpan,
+      relationship: 'child_of'
+    });
 
     // TODO: is this safe if there are multiple kernels trying to use
     // the transform? Can we construct individual transforms/comms for
@@ -77,9 +88,12 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       mode: 'vega'
     });
     this._view = res.view;
+
+    await finishSpan(vegaEmbedSpan);
+
     this._renderingSpec = false;
     this._renderedSpec = vlSpec;
-    renderModelSpan.finish();
+    await finishSpan(renderModelSpan);
   }
 
   /**

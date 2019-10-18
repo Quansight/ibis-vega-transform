@@ -42,8 +42,10 @@ def compiler_target_function(comm, msg):
     spec = data["spec"]
     injected_span = data["span"]
 
-    root_ref = opentracing.follows_from((tracer.extract(opentracing.Format.TEXT_MAP, injected_span)))
-    
+    root_ref = opentracing.child_of(
+        (tracer.extract(opentracing.Format.TEXT_MAP, injected_span))
+    )
+
     with tracer.start_span("compile-vega", references=root_ref) as span:
         _incoming_specs.append(spec)
         try:
@@ -193,6 +195,7 @@ def _cleanup_spec(spec):
     return new
 
 
-get_ipython().kernel.comm_manager.register_target(
-    "ibis-vega-transform:compiler", compiler_target_function
-)
+if get_ipython():
+    get_ipython().kernel.comm_manager.register_target(
+        "ibis-vega-transform:compiler", compiler_target_function
+    )

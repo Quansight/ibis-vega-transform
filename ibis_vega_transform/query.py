@@ -89,5 +89,6 @@ def _patch_vegaexpr(expr: str, name: str, value: str) -> str:
     return expr
 
 
-get_ipython().kernel.comm_manager.register_target("queryibis", query_target_func)
+if get_ipython():
+    get_ipython().kernel.comm_manager.register_target("queryibis", query_target_func)
 
