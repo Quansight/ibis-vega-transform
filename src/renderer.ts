@@ -1,4 +1,3 @@
-import { DocumentRegistry } from '@jupyterlab/docregistry';
 import { IRenderMime } from '@jupyterlab/rendermime';
 import { Widget } from '@phosphor/widgets';
 import * as vega from 'vega';
@@ -6,6 +5,7 @@ import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
 import ibisTransform from './transform';
 import { startSpanExtract, finishSpan, injectSpan, startSpan } from './tracing';
+import { Kernel } from '@jupyterlab/services';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';
 
@@ -18,7 +18,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
    * Construct a new renderer.
    */
   constructor(
-    private _context: DocumentRegistry.IContext<DocumentRegistry.IModel>
+    private getKernel: () => Promise<Kernel.IKernelConnection | null>
   ) {
     super();
   }
@@ -36,7 +36,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       reference: injectedSpan,
       relationship: 'follows_from'
     });
-    const kernel = this._context.session.kernel;
+    const kernel = await this.getKernel();
 
     if (kernel === null) {
       return;
