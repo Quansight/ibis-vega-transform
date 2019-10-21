@@ -35,7 +35,7 @@ alt.Chart(table).mark_bar().encode(
 )
 ```
 
-Check out the notebooks in the [`./examples/`](./examples/] directory to see
+Check out the notebooks in the [`./examples/`](./examples/) directory to see
 some options using interactive charts and the OmniSci backend.
 
 ## Development
