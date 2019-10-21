@@ -68,7 +68,10 @@ jlpm run prettier
 
 ### Dashboards
 
+![](./docs/dashboard.png)
+
 You can create dashboards from notebooks by using Phoila:
+
 
 
 ```bash
