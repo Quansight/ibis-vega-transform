@@ -1,10 +1,8 @@
 # ibis-vega-transform <br /> [![binder logo](https://beta.mybinder.org/badge.svg)](https://mybinder.org/v2/gh/Quansight/ibis-vega-transform/master?urlpath=lab/tree/examples/vega-compiler.ipynb) [![](https://img.shields.io/pypi/v/ibis-vega-transform.svg?style=flat-square)](https://pypi.python.org/pypi/ibis-vega-transform) [![](https://img.shields.io/npm/v/ibis-vega-transform.svg?style=flat-square)](https://www.npmjs.com/package/ibis-vega-transform)
 
-
 Python evaluation of Vega transforms using Ibis expressions.
 
 For inspiration, see https://github.com/jakevdp/altair-transform
-
 
 ## Getting started
 
@@ -67,6 +65,21 @@ black ibis_vega_transform
 jlpm run prettier
 ```
 
+
+### Dashboards
+
+![](./docs/dashboard.png)
+
+You can create dashboards from notebooks by using Phoila:
+
+
+
+```bash
+# Need his PR https://github.com/vidartf/phoila/pull/11
+pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
+phoila install .
+phoila "examples/Charting Example.ipynb"
+```
 
 ## Releasing
 
