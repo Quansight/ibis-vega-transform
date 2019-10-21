@@ -31,12 +31,22 @@ function activate(
   notebooks: INotebookTracker | null,
   voila: TVoilaTracker | null
 ) {
-  console.log(notebooks, voila);
   if (voila) {
-    voila.widgetAdded.connect((_, widget) => {
-      console.log(widget);
+    voila.widgetAdded.connect(async (_, widget) => {
+      const session = widget.content.session;
+      session.rendermime.addFactory(
+        {
+          safe: true,
+          defaultRank: 50,
+          mimeTypes: [MIME_TYPE],
+          createRenderer: () =>
+            new IbisVegaRenderer(async () => (await session.connected).kernel)
+        },
+        0
+      );
     });
   }
+
   if (notebooks) {
     notebooks.widgetAdded.connect((_, { context, content }) => {
       content.rendermime.addFactory(
@@ -44,7 +54,8 @@ function activate(
           safe: true,
           defaultRank: 50,
           mimeTypes: [MIME_TYPE],
-          createRenderer: () => new IbisVegaRenderer(context)
+          createRenderer: () =>
+            new IbisVegaRenderer(async () => context.session.kernel)
         },
         0
       );
