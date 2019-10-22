@@ -4,16 +4,18 @@ Python HTTP server to record traces from the browser.
 We won't need this anymore once jaeger supports clien side reporting.
 """
 
+import os
 import typing
 
 import opentracing
-import uvicorn
 from mypy_extensions import TypedDict
+from typing_extensions import Literal
+
+import uvicorn
 from starlette.applications import Starlette
 from starlette.exceptions import HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
-from typing_extensions import Literal
 
 from .tracer import tracer
 
@@ -94,4 +96,4 @@ async def finish_span(request):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=int(os.environ["PORT"]))

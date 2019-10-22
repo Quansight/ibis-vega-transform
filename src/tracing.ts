@@ -1,7 +1,9 @@
-const SERVER_URL = 'http://localhost:8000';
+import { PageConfig } from '@jupyterlab/coreutils';
+
+const SERVER_URL = new URL('jaeger_proxy/', PageConfig.getBaseUrl());
 
 async function callServer(path: string, data: object): Promise<any> {
-  const response = await fetch(`${SERVER_URL}/${path}`, {
+  const response = await fetch(String(new URL(path, SERVER_URL)), {
     body: JSON.stringify(data),
     method: 'POST',
     mode: 'cors',

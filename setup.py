@@ -25,8 +25,17 @@ setuptools.setup(
         "ibis-framework",
         "mypy_extensions",
         "typing_extensions",
-        "jaeger-client"
+        "jaeger-client",
+        "jupyter-server-proxy",
+        "uvicorn",
+        "starlette"
     ],
+    entry_points={
+        "jupyter_serverproxy_servers": [
+            "jaeger_proxy = jaeger_entrypoint:setup_jaeger_proxy",
+            "jaeger = jaeger_entrypoint:setup_jaeger_all"
+        ]
+    },
     extras_require={"dev": ["black"]},
     python_requires=">=3.6",
     include_package_data=True,

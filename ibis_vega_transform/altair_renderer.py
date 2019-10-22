@@ -1,12 +1,10 @@
-import typing
-
 import altair
 import opentracing
 
 from .globals import get_active_span, get_fallback, set_active_span
 from .tracer import tracer
 
-__all__: typing.List[str] = []
+__all__ = ["altair_renderer"]
 
 # New Vega Lite renderer mimetype which can process ibis expressions in names
 MIMETYPE = "application/vnd.vega.ibis.v5+json"
@@ -28,6 +26,3 @@ def altair_renderer(spec):
     set_active_span(None)
     return {MIMETYPE: {"spec": spec, "span": injected_span}}
 
-
-altair.renderers.register("ibis", altair_renderer)
-altair.renderers.enable("ibis")

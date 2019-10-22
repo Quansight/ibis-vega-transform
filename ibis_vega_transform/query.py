@@ -8,13 +8,12 @@ import typing
 import altair
 import altair.vegalite.v3.display
 import opentracing
-from IPython import get_ipython
 
 from .core import apply
 from .globals import _expr_map
 from .tracer import tracer
 
-__all__: typing.List[str] = []
+__all__ = ["query_target_func"]
 
 
 def query_target_func(comm, msg):
@@ -73,7 +72,3 @@ def _patch_vegaexpr(expr: str, name: str, value: str) -> str:
         f"vlSelectionTest\({quote}{name}{quote}", f"vlSelectionTest({value}", expr
     )
     return expr
-
-
-if get_ipython():
-    get_ipython().kernel.comm_manager.register_target("queryibis", query_target_func)

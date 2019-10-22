@@ -3,12 +3,11 @@ import re
 import typing
 
 import opentracing
-from IPython import get_ipython
 
 from .globals import DATA_NAME_PREFIX, _expr_map
 from .tracer import tracer
 
-__all__ = ["_incoming_specs", "_outgoing_specs"]
+__all__ = ["compiler_target_function"]
 
 # An empty vega spec to send when we get invalid data.
 EMPTY_VEGA = {
@@ -195,8 +194,3 @@ def _cleanup_spec(spec):
     new["data"] = [data for data in new["data"] if data not in nonreferenced_data]
     return new
 
-
-if get_ipython():
-    get_ipython().kernel.comm_manager.register_target(
-        "ibis-vega-transform:compiler", compiler_target_function
-    )

@@ -8,7 +8,9 @@ For inspiration, see https://github.com/jakevdp/altair-transform
 
 ```bash
 pip install ibis-vega-transform
-jupyter labextension  install ibis-vega-transform
+jupyter labextension install \
+    ibis-vega-transform \
+    jupyterlab-server-proxy-saulshanabrook # optional, if you want to see icon in JL to launch tracing GUI
 ```
 
 Then in a notebook, import the Python package and pass in an ibis expression
@@ -85,10 +87,6 @@ phoila "examples/Charting Example.ipynb"
 ### Tracing
 
 1. Install [Jaeger binary](https://www.jaegertracing.io/download/)
-2. `jaeger-all-in-one`
-3. `env JAEGER_SERVICE_NAME=browser python -m ibis_vega_transform.tracing_server`
-4. `open http://localhost:16686/`
-5. Display ch arts and look at traces
 
 ## Releasing
 

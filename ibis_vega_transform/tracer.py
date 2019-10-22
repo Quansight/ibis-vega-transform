@@ -1,6 +1,5 @@
-import jaeger_client
-
 import os
+import jaeger_client
 
 __all__ = ["tracer"]
 

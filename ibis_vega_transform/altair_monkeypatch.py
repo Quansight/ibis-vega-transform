@@ -1,11 +1,10 @@
-import typing
 import warnings
 
 import altair
 import ibis
 import pandas
 
-__all__: typing.List[str] = []
+__all__ = ["monkeypatch_altair"]
 
 
 def monkeypatch_altair():
@@ -47,4 +46,3 @@ def empty_dataframe(expr: ibis.Expr) -> pandas.DataFrame:
     return expr.schema().apply_to(pandas.DataFrame(columns=expr.columns))
 
 
-monkeypatch_altair()

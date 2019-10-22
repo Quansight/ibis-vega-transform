@@ -1,5 +1,3 @@
-import typing
-
 import altair
 import pandas
 from opentracing import tags
@@ -13,7 +11,7 @@ from .globals import (
 )
 from .tracer import tracer
 
-__all__: typing.List[str] = []
+__all__ = ["altair_data_transformer"]
 
 
 def altair_data_transformer(data):
@@ -39,6 +37,3 @@ def altair_data_transformer(data):
     _expr_map[h] = expr
     return {"name": name}
 
-
-altair.data_transformers.register("ibis", altair_data_transformer)
-altair.data_transformers.enable("ibis")
