@@ -26,16 +26,8 @@ setuptools.setup(
         "mypy_extensions",
         "typing_extensions",
         "jaeger-client",
-        "jupyter-server-proxy",
-        "uvicorn",
-        "starlette"
+        "jupyter_jaeger",
     ],
-    entry_points={
-        "jupyter_serverproxy_servers": [
-            "jaeger_proxy = jaeger_entrypoint:setup_jaeger_proxy",
-            "jaeger = jaeger_entrypoint:setup_jaeger_all"
-        ]
-    },
     extras_require={"dev": ["black"]},
     python_requires=">=3.6",
     include_package_data=True,

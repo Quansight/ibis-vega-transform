@@ -86,7 +86,8 @@ phoila "examples/Charting Example.ipynb"
 
 ### Tracing
 
-1. Install [Jaeger binary](https://www.jaegertracing.io/download/)
+We are using [`jupyter-jaeger`](https://github.com/Quansight/jupyter-jaeger) to trace each interaction
+for benchmarking.
 
 ## Releasing
 

@@ -2042,6 +2042,11 @@ isobject@^3.0.0, isobject@^3.0.1:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-3.0.1.tgz#4e431e92b11a9731636aa1f9c8d1ccbcfdab78df"
   integrity sha1-TkMekrEalzFjaqH5yNHMvP2reN8=
 
+jaeger-browser@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/jaeger-browser/-/jaeger-browser-1.0.0.tgz#77cad9959268f499a0f0a1b34b6ab6218334aaf9"
+  integrity sha512-4/sH0Q7uXnxXA3eQj3jBKF7AEUwQapKQj1ekkGqADwt+fPyYDImaRmvAv/AZcuD7IPqtSelgNYp31JLxaMrk1g==
+
 jest-docblock@^21.0.0:
   version "21.2.0"
   resolved "https://registry.yarnpkg.com/jest-docblock/-/jest-docblock-21.2.0.tgz#51529c3b30d5fd159da60c27ceedc195faf8d414"
@@ -2096,6 +2101,14 @@ json5@^2.1.0:
   integrity sha512-l+3HXD0GEI3huGq1njuqtzYK8OYJyXMkOLtQ53pjWh89tvWS2h6l+1zMkYWqlb57+SiQodKZyvMEFb2X+KrFhQ==
   dependencies:
     minimist "^1.2.0"
+
+jupyter-jaeger@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/jupyter-jaeger/-/jupyter-jaeger-1.0.1.tgz#0ed5e1b0ca0cb7cf4af9d9b58af0facc7eb2f833"
+  integrity sha512-rRYhf/aTca1NEPRiYXDeKF7f8cpvIenwB96Rt57sgGBCP+gkgNKMFYl2SoT4JQ70+O06qyzCb0rydYTNSRilMg==
+  dependencies:
+    "@jupyterlab/coreutils" "^3.1.0"
+    jaeger-browser "^1.0.0"
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"

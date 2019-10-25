@@ -4,7 +4,7 @@ import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
 import ibisTransform from './transform';
-import { startSpanExtract, finishSpan, injectSpan, startSpan } from './tracing';
+import { client } from 'jupyter-jaeger';
 import { Kernel } from '@jupyterlab/services';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';
@@ -31,7 +31,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       spec: any;
       span: object;
     };
-    const renderModelSpan = await startSpanExtract({
+    const renderModelSpan = await client.startSpanExtract({
       name: 'renderModel',
       reference: injectedSpan,
       relationship: 'follows_from'
@@ -58,7 +58,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       this._view = null;
     }
 
-    const compileSpecSpan = await startSpan({
+    const compileSpecSpan = await client.startSpan({
       name: 'compileSpec',
       reference: renderModelSpan,
       relationship: 'child_of'
@@ -67,13 +67,13 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
     const vSpec = await compileSpec(
       kernel,
       vlSpec,
-      await injectSpan(compileSpecSpan),
+      await client.injectSpan(compileSpecSpan),
       injectedSpan
     );
 
-    await finishSpan(compileSpecSpan);
+    await client.finishSpan(compileSpecSpan);
 
-    const vegaEmbedSpan = await startSpan({
+    const vegaEmbedSpan = await client.startSpan({
       name: 'vegaEmbed',
       reference: renderModelSpan,
       relationship: 'child_of'
@@ -90,11 +90,11 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
     });
     this._view = res.view;
 
-    await finishSpan(vegaEmbedSpan);
+    await client.finishSpan(vegaEmbedSpan);
 
     this._renderingSpec = false;
     this._renderedSpec = vlSpec;
-    await finishSpan(renderModelSpan);
+    await client.finishSpan(renderModelSpan);
   }
 
   /**
