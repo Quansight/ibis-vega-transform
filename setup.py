@@ -25,6 +25,8 @@ setuptools.setup(
         "ibis-framework",
         "mypy_extensions",
         "typing_extensions",
+        "jaeger-client",
+        "jupyter_jaeger",
     ],
     extras_require={"dev": ["black"]},
     python_requires=">=3.6",

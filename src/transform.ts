@@ -2,6 +2,7 @@ import { Kernel } from '@jupyterlab/services';
 import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
 import * as vega from 'vega';
 import * as dataflow from 'vega-dataflow';
+import { client } from 'jupyter-jaeger';
 
 /**
  * Tries parsing all string values as dates.  Any that cannot be parsed are left alone
@@ -34,6 +35,7 @@ const TRANSFORM = 'queryibis';
  */
 class QueryIbis extends dataflow.Transform implements vega.Transform {
   constructor(params: any) {
+    console.log(params);
     super([], params);
   }
 
@@ -41,6 +43,11 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
    * The current kernel instance for the QueryIbis transform.
    */
   static kernel: Kernel.IKernelConnection | null;
+
+  /**
+   * Whether to record traces
+   */
+  static tracing: boolean;
 
   /**
    * The definition for the transform. Used by the vega dataflow logic
@@ -66,6 +73,11 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
         type: 'transform',
         array: true,
         required: false
+      },
+      {
+        name: 'span',
+        type: 'object',
+        required: false
       }
     ]
   };
@@ -78,24 +90,49 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
   }
 
   async transform(parameters: any, pulse: any): Promise<any> {
+    const { tracing } = QueryIbis;
+    const spanExtract = tracing
+      ? await client.startSpanExtract({
+          name: 'transform',
+          relationship: 'follows_from',
+          reference: parameters.span
+        })
+      : null;
+
     const kernel = QueryIbis.kernel;
     if (!kernel) {
       console.error('Not connected to kernel');
       return;
     }
 
+    const commSpan = tracing
+      ? await client.startSpan({
+          name: 'comm:queryibis',
+          reference: spanExtract!,
+          relationship: 'child_of'
+        })
+      : null;
+
     // Fetch the query results from the kernel.
     const comm = kernel.connectToComm('queryibis');
+
     const resultPromise = new PromiseDelegate<JSONObject[]>();
     comm.onMsg = msg =>
       resultPromise.resolve((msg.content.data as any) as JSONObject[]);
 
-    console.log('Fetching data', parameters);
+    // set span inside comm to be this comm message instead of root span
+    if (tracing) {
+      parameters.span = await client.injectSpan(commSpan!);
+    }
+
     await comm.open(parameters).done;
     const result: JSONObject[] = await resultPromise.promise;
-    console.log('Received data', result);
+
+    if (tracing) {
+      await client.finishSpan(commSpan!);
+    }
+
     const parsedResult = result.map(parseDates);
-    console.log('Parsed data', parsedResult);
 
     // Ingest the data and push it into the dataflow graph.
     parsedResult.forEach(dataflow.ingest);
@@ -105,6 +142,9 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
     out.rem = this._value;
     this._value = out.add = out.source = parsedResult;
 
+    if (tracing) {
+      await client.finishSpan(spanExtract!);
+    }
     return out;
   }
 

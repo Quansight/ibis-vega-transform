@@ -6,3 +6,4 @@ dependencies:
   - nodejs
   - python>=3.7
   - jupyterlab
+  - notebook<6.0

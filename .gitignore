@@ -18,3 +18,4 @@ node_modules/*
 **/.mypy_cache
 *.db
 yarn-error.log
+*.code-workspace
