@@ -18,7 +18,8 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
    * Construct a new renderer.
    */
   constructor(
-    private getKernel: () => Promise<Kernel.IKernelConnection | null>
+    private getKernel: () => Promise<Kernel.IKernelConnection | null>,
+    private tracing: boolean
   ) {
     super();
   }
@@ -31,11 +32,16 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       spec: any;
       span: object;
     };
-    const renderModelSpan = await client.startSpanExtract({
-      name: 'renderModel',
-      reference: injectedSpan,
-      relationship: 'follows_from'
-    });
+    const { tracing } = this;
+
+    let renderModelSpan = tracing
+      ? await client.startSpanExtract({
+          name: 'renderModel',
+          reference: injectedSpan,
+          relationship: 'follows_from'
+        })
+      : null;
+
     const kernel = await this.getKernel();
 
     if (kernel === null) {
@@ -58,31 +64,37 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
       this._view = null;
     }
 
-    const compileSpecSpan = await client.startSpan({
-      name: 'compileSpec',
-      reference: renderModelSpan,
-      relationship: 'child_of'
-    });
+    const compileSpecSpan = tracing
+      ? await client.startSpan({
+          name: 'compileSpec',
+          reference: renderModelSpan!,
+          relationship: 'child_of'
+        })
+      : null;
 
     const vSpec = await compileSpec(
       kernel,
       vlSpec,
-      await client.injectSpan(compileSpecSpan),
+      tracing ? await client.injectSpan(compileSpecSpan!) : injectedSpan,
       injectedSpan
     );
 
-    await client.finishSpan(compileSpecSpan);
-
-    const vegaEmbedSpan = await client.startSpan({
-      name: 'vegaEmbed',
-      reference: renderModelSpan,
-      relationship: 'child_of'
-    });
+    if (tracing) {
+      await client.finishSpan(compileSpecSpan!);
+    }
+    const vegaEmbedSpan = tracing
+      ? await client.startSpan({
+          name: 'vegaEmbed',
+          reference: renderModelSpan!,
+          relationship: 'child_of'
+        })
+      : null;
 
     // TODO: is this safe if there are multiple kernels trying to use
     // the transform? Can we construct individual transforms/comms for
     // each renderer? What does IPywidgets do?
     ibisTransform.kernel = kernel;
+    ibisTransform.tracing = tracing;
     const res = await vegaEmbed(this.node, vSpec, {
       actions: true,
       defaultStyle: true,
@@ -90,11 +102,15 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
     });
     this._view = res.view;
 
-    await client.finishSpan(vegaEmbedSpan);
+    if (tracing) {
+      await client.finishSpan(vegaEmbedSpan!);
+    }
 
     this._renderingSpec = false;
     this._renderedSpec = vlSpec;
-    await client.finishSpan(renderModelSpan);
+    if (tracing) {
+      await client.finishSpan(renderModelSpan!);
+    }
   }
 
   /**

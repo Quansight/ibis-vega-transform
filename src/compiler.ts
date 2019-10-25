@@ -30,7 +30,7 @@ export async function compileSpec(
   const transformedSpecPromise = new PromiseDelegate<any>();
   const comm = kernel.connectToComm(COMM_ID);
   comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
-  await comm.open({ spec: vSpec, span: span, rootSpan } as any).done;
+  await comm.open({ spec: vSpec, span, rootSpan } as any).done;
   const finalSpec = await transformedSpecPromise.promise;
   return finalSpec;
 }

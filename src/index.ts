@@ -40,7 +40,10 @@ function activate(
           defaultRank: 50,
           mimeTypes: [MIME_TYPE],
           createRenderer: () =>
-            new IbisVegaRenderer(async () => (await session.connected).kernel)
+            new IbisVegaRenderer(
+              async () => (await session.connected).kernel,
+              false
+            )
         },
         0
       );
@@ -55,7 +58,7 @@ function activate(
           defaultRank: 50,
           mimeTypes: [MIME_TYPE],
           createRenderer: () =>
-            new IbisVegaRenderer(async () => context.session.kernel)
+            new IbisVegaRenderer(async () => context.session.kernel, true)
         },
         0
       );

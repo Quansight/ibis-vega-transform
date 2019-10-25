@@ -45,6 +45,11 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
   static kernel: Kernel.IKernelConnection | null;
 
   /**
+   * Whether to record traces
+   */
+  static tracing: boolean;
+
+  /**
    * The definition for the transform. Used by the vega dataflow logic
    * to decide how to use the transform.
    */
@@ -85,12 +90,14 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
   }
 
   async transform(parameters: any, pulse: any): Promise<any> {
-
-    const spanExtract = await client.startSpanExtract({
-      name: 'transform',
-      relationship: 'follows_from',
-      reference: parameters.span
-    });
+    const { tracing } = QueryIbis;
+    const spanExtract = tracing
+      ? await client.startSpanExtract({
+          name: 'transform',
+          relationship: 'follows_from',
+          reference: parameters.span
+        })
+      : null;
 
     const kernel = QueryIbis.kernel;
     if (!kernel) {
@@ -98,11 +105,13 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
       return;
     }
 
-    const commSpan = await client.startSpan({
-      name: 'comm:queryibis',
-      reference: spanExtract,
-      relationship: 'child_of'
-    });
+    const commSpan = tracing
+      ? await client.startSpan({
+          name: 'comm:queryibis',
+          reference: spanExtract!,
+          relationship: 'child_of'
+        })
+      : null;
 
     // Fetch the query results from the kernel.
     const comm = kernel.connectToComm('queryibis');
@@ -112,12 +121,16 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
       resultPromise.resolve((msg.content.data as any) as JSONObject[]);
 
     // set span inside comm to be this comm message instead of root span
-    parameters.span = await client.injectSpan(commSpan);
+    if (tracing) {
+      parameters.span = await client.injectSpan(commSpan!);
+    }
 
     await comm.open(parameters).done;
     const result: JSONObject[] = await resultPromise.promise;
 
-    await client.finishSpan(commSpan);
+    if (tracing) {
+      await client.finishSpan(commSpan!);
+    }
 
     const parsedResult = result.map(parseDates);
 
@@ -129,7 +142,9 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
     out.rem = this._value;
     this._value = out.add = out.source = parsedResult;
 
-    await client.finishSpan(spanExtract);
+    if (tracing) {
+      await client.finishSpan(spanExtract!);
+    }
     return out;
   }
 

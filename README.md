@@ -11,6 +11,7 @@ pip install ibis-vega-transform
 jupyter labextension install \
     ibis-vega-transform \
     jupyterlab-server-proxy-saulshanabrook # optional, if you want to see icon in JL to launch tracing GUI
+    
 ```
 
 Then in a notebook, import the Python package and pass in an ibis expression
@@ -39,6 +40,16 @@ alt.Chart(table).mark_bar().encode(
 
 Check out the notebooks in the [`./examples/`](./examples/) directory to see
 some options using interactive charts and the OmniSci backend.
+
+You can also create dashboards with this with Phoila.
+
+![](./docs/dashboard.png)
+
+```bash
+pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
+phoila install ibis-vega-transform
+phoila "examples/Charting Example.ipynb"
+```
 
 ## Development
 
@@ -73,7 +84,6 @@ jlpm run prettier
 
 ### Dashboards
 
-![](./docs/dashboard.png)
 
 You can create dashboards from notebooks by using Phoila:
 

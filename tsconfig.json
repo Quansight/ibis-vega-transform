@@ -16,7 +16,7 @@
     "outDir": "lib",
     "rootDir": "src",
     "strict": true,
-    "strictNullChecks": false,
+    "skipLibCheck": true,
     "target": "es2017",
     "types": [],
     "lib": ["dom", "esnext", "esnext.asynciterable"]
