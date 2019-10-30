@@ -1,5 +1,6 @@
 import altair
 import opentracing
+import typing
 
 from .globals import get_active_span, get_fallback, set_active_span
 from .tracer import tracer
@@ -18,11 +19,11 @@ def altair_renderer(spec):
         return altair.vegalite.v3.display.default_renderer(spec)
 
     active_span = get_active_span()
-    injected_span = {}
+    assert active_span
+    injected_span: typing.Dict = {}
     tracer.inject(active_span, opentracing.Format.TEXT_MAP, injected_span)
-    get_active_span().log_kv({"vega-lite:initial": spec})
-
+    active_span.log_kv({"vega-lite:initial": spec})
     active_span.finish()
     set_active_span(None)
-    return {MIMETYPE: {"spec": spec, "span": injected_span}}
 
+    return {MIMETYPE: {"spec": spec, "span": injected_span}}
