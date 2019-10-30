@@ -104,14 +104,13 @@ for benchmarking.
 First create a test environment:
 
 ```bash
-conda create -n tmp -c conda-forge nodejs
+conda create -n tmp -c conda-forge nodejs pip wheel twine
 conda activate tmp
 ```
 
 Then bump the Python version in `setup.py` and upload a test version:
 
 ```bash
-pip install --upgrade setuptools wheel twine
 rm -rf dist/
 python setup.py sdist bdist_wheel
 twine upload --repository-url https://test.pypi.org/legacy/ dist/*
