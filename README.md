@@ -71,7 +71,7 @@ jupyter labextension install . --no-build
 
 
 jupyter lab --watch
-jlpm run build:watch
+jlpm run watch
 ```
 
 To format all the files:
