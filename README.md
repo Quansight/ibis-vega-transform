@@ -10,6 +10,7 @@ For inspiration, see https://github.com/jakevdp/altair-transform
 pip install ibis-vega-transform
 jupyter labextension install \
     ibis-vega-transform \
+    "tornado<6" \
     jupyterlab-server-proxy-saulshanabrook # optional, if you want to see icon in JL to launch tracing GUI
 
 # Optionally install `jaeger-all-in-one` binary and add to path to see tracing
