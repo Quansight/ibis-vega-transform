@@ -11,7 +11,9 @@ pip install ibis-vega-transform
 jupyter labextension install \
     ibis-vega-transform \
     jupyterlab-server-proxy-saulshanabrook # optional, if you want to see icon in JL to launch tracing GUI
-    
+
+# Optionally install `jaeger-all-in-one` binary and add to path to see tracing
+# https://www.jaegertracing.io/download/
 ```
 
 Then in a notebook, import the Python package and pass in an ibis expression
@@ -55,9 +57,6 @@ phoila "examples/Charting Example.ipynb"
 
 To install from source, run the following in a terminal:
 
-
-
-
 ```bash
 git clone git@github.com:Quansight/ibis-vega-transform.git
 
@@ -81,9 +80,7 @@ black ibis_vega_transform
 jlpm run prettier
 ```
 
-
 ### Dashboards
-
 
 You can create dashboards from notebooks by using Phoila:
 
