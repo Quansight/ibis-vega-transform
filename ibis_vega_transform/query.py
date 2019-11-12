@@ -22,11 +22,7 @@ def query_target_func(comm, msg):
     """
     # These are the paramaters passed to the vega transform
     parameters: dict = msg["content"]["data"]
-
-    name: str = parameters.pop("name")
-    transforms: typing.Optional[str] = parameters.pop("transform", None)
     injected_span: object = parameters.pop("span")
-
     with tracer.start_span(
         "queryibis",
         references=[
@@ -35,10 +31,14 @@ def query_target_func(comm, msg):
             )
         ],
     ) as span:
+        span.log_kv(parameters)
+        name: str = parameters.pop("name")
+        transforms: typing.Optional[str] = parameters.pop("transform", None)
+
         if name not in _expr_map:
             raise ValueError(f"{name} is not an expression known to us!")
         expr = _expr_map[name]
-        span.log_kv({"sql:initial": expr.compile(), "transforms": transforms})
+        span.log_kv({"sql:initial": expr.compile()})
         if transforms:
             # Replace all string instances of data references with value in schema
             for k, v in parameters.items():
