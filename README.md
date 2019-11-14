@@ -59,8 +59,9 @@ If you want to see traces of the interactiosn for debugging and performance anal
 install tthe `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshanabrook`
 lab extension to see the Jaeger icon in the launcher.
 
-
-Then open up the Jaeger tracer before running the notebook, run some visualizations and look at the traces.
+TheJjaeger server won't actually be started until a HTTP request is sent to it,
+so before you run your visualization, click the "Jaeger" icon in the JupyterLab launcher or go to
+`/jaeger` to open the UI. Then run your visualization and you should see the traces appear in Jaeger.
 
 You also will likely have to increase the max UDP packet size on your OS to [accomdate for the large logs](https://github.com/jaegertracing/jaeger-client-node/issues/124#issuecomment-324222456):
 
