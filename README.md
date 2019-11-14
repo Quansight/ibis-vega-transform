@@ -7,14 +7,8 @@ For inspiration, see https://github.com/jakevdp/altair-transform
 ## Getting started
 
 ```bash
-pip install ibis-vega-transform
-jupyter labextension install \
-    ibis-vega-transform \
-    "tornado<6" \
-    jupyterlab-server-proxy-saulshanabrook # optional, if you want to see icon in JL to launch tracing GUI
-
-# Optionally install `jaeger-all-in-one` binary and add to path to see tracing
-# https://www.jaegertracing.io/download/
+pip install ibis-vega-transform "tornado<6"
+jupyter labextension install ibis-vega-transform
 ```
 
 Then in a notebook, import the Python package and pass in an ibis expression
@@ -44,6 +38,9 @@ alt.Chart(table).mark_bar().encode(
 Check out the notebooks in the [`./examples/`](./examples/) directory to see
 some options using interactive charts and the OmniSci backend.
 
+
+### Dashboards
+
 You can also create dashboards with this with Phoila.
 
 ![](./docs/dashboard.png)
@@ -53,6 +50,24 @@ pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
 phoila install ibis-vega-transform
 phoila "examples/Charting Example.ipynb"
 ```
+
+### Tracing
+
+If you want to see traces of the interactiosn for debugging and performance analysis,
+install tthe `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshanabrook`
+lab extension to see the Jaeger icon in the launcher.
+
+TheJjaeger server won't actually be started until a HTTP request is sent to it,
+so before you run your visualization, click the "Jaeger" icon in the JupyterLab launcher or go to
+`/jaeger` to open the UI. Then run your visualization and you should see the traces appear in Jaeger.
+
+You also will likely have to increase the max UDP packet size on your OS to [accomdate for the large logs](https://github.com/jaegertracing/jaeger-client-node/issues/124#issuecomment-324222456):
+
+```bash
+# Mac
+sudo sysctl net.inet.udp.maxdgram=200000
+```
+
 
 ## Development
 
