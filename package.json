@@ -43,13 +43,10 @@
     "jupyter-jaeger": "^1.0.1",
     "vega": "5.4.0",
     "vega-embed": "4.2.4",
-    "vega-lite": "3.4.0"
-  },
-  "peerDependencies": {
+    "vega-lite": "3.4.0",
     "phoila": "^0.3.0"
   },
   "devDependencies": {
-    "phoila": "^0.3.0",
     "@types/jaeger-client": "3.15.1",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.1.0",
