@@ -122,7 +122,7 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
 
     // set span inside comm to be this comm message instead of root span
     if (tracing) {
-      parameters.span = await client.injectSpan(commSpan!);
+      parameters = { ...parameters, span: await client.injectSpan(commSpan!) };
     }
 
     await comm.open(parameters).done;
