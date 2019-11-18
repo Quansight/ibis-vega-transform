@@ -25,7 +25,6 @@ setuptools.setup(
         "vega_datasets",
         "ibis-framework",
         "pymapd",
-        "notebook<6",
         "tornado<6",
         "mypy_extensions",
         "typing_extensions",
