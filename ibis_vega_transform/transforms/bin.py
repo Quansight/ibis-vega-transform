@@ -47,7 +47,6 @@ def bin(transform: BinTransform, expr: ibis.Expr) -> ibis.Expr:
     left = (min_ + (bin_ * binwidth)).name(as_left)
     right = (((min_ + binwidth) + (bin_ * binwidth))).name(as_right)
 
-    # raise ''
     # add the two new fields and remove the initial column
     return expr.mutate(
         [left, right]
