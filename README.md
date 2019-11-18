@@ -7,7 +7,7 @@ For inspiration, see https://github.com/jakevdp/altair-transform
 ## Getting started
 
 ```bash
-pip install ibis-vega-transform "tornado<6"
+pip install ibis-vega-transform
 jupyter labextension install ibis-vega-transform
 ```
 
