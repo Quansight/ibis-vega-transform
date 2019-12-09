@@ -20,3 +20,4 @@ node_modules/*
 yarn-error.log
 *.code-workspace
 package-lock.json
+yarn.lock
