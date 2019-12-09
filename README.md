@@ -38,7 +38,6 @@ alt.Chart(table).mark_bar().encode(
 Check out the notebooks in the [`./examples/`](./examples/) directory to see
 some options using interactive charts and the OmniSci backend.
 
-
 ### Dashboards
 
 You can also create dashboards with this with Phoila.
@@ -68,7 +67,6 @@ You also will likely have to increase the max UDP packet size on your OS to [acc
 sudo sysctl net.inet.udp.maxdgram=200000
 ```
 
-
 ## Development
 
 To install from source, run the following in a terminal:
@@ -89,7 +87,9 @@ jupyter lab --watch
 jlpm run watch
 ```
 
-To format all the files:
+A pre-commit hook is installed usig Husky (Git > 2.13 is required!) to forma files.
+
+Run the formating tools at any time using:
 
 ```bash
 black ibis_vega_transform

@@ -44,5 +44,3 @@ def empty_dataframe(expr: ibis.Expr) -> pandas.DataFrame:
     https://github.com/ibis-project/ibis/issues/1676#issuecomment-441472528
     """
     return expr.schema().apply_to(pandas.DataFrame(columns=expr.columns))
-
-
