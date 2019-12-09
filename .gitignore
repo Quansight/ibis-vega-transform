@@ -19,3 +19,5 @@ node_modules/*
 *.db
 yarn-error.log
 *.code-workspace
+package-lock.json
+yarn.lock
