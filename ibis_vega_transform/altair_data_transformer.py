@@ -36,4 +36,3 @@ def altair_data_transformer(data):
     name = f"{DATA_NAME_PREFIX}{h}"
     _expr_map[h] = expr
     return {"name": name}
-
