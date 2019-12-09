@@ -7,7 +7,7 @@ For inspiration, see https://github.com/jakevdp/altair-transform
 ## Getting started
 
 ```sh
-pip install ibis-vega-transform "tornado<6"
+pip install ibis-vega-transform
 jupyter labextension install ibis-vega-transform
 ```
 
@@ -53,10 +53,17 @@ phoila "examples/Charting Example.ipynb"
 ### Tracing
 
 If you want to see traces of the interactiosn for debugging and performance analysis,
-install tthe `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshanabrook`
+install the `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshanabrook`
 lab extension to see the Jaeger icon in the launcher.
 
-TheJjaeger server won't actually be started until a HTTP request is sent to it,
+
+```bash
+conda install -c conda-forge
+jupyter labextension install jupyterlab-server-proxy-saulshanabrook
+```
+
+
+The Jaeger server won't actually be started until a HTTP request is sent to it,
 so before you run your visualization, click the "Jaeger" icon in the JupyterLab launcher or go to
 `/jaeger` to open the UI. Then run your visualization and you should see the traces appear in Jaeger.
 
