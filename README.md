@@ -6,7 +6,7 @@ For inspiration, see https://github.com/jakevdp/altair-transform
 
 ## Getting started
 
-```bash
+```sh
 pip install ibis-vega-transform "tornado<6"
 jupyter labextension install ibis-vega-transform
 ```
@@ -44,7 +44,7 @@ You can also create dashboards with this with Phoila.
 
 ![](./docs/dashboard.png)
 
-```bash
+```sh
 pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
 phoila install ibis-vega-transform
 phoila "examples/Charting Example.ipynb"
@@ -62,7 +62,7 @@ so before you run your visualization, click the "Jaeger" icon in the JupyterLab 
 
 You also will likely have to increase the max UDP packet size on your OS to [accomdate for the large logs](https://github.com/jaegertracing/jaeger-client-node/issues/124#issuecomment-324222456):
 
-```bash
+```sh
 # Mac
 sudo sysctl net.inet.udp.maxdgram=200000
 ```
@@ -71,7 +71,7 @@ sudo sysctl net.inet.udp.maxdgram=200000
 
 To install from source, run the following in a terminal:
 
-```bash
+```sh
 git clone git@github.com:Quansight/ibis-vega-transform.git
 
 cd ibis-vega-transform
@@ -87,11 +87,11 @@ jupyter lab --watch
 jlpm run watch
 ```
 
-A pre-commit hook is installed usig Husky (Git > 2.13 is required!) to forma files.
+A pre-commit hook is installed usig Husky (Git > 2.13 is required!) to format files.
 
-Run the formating tools at any time using:
+Run the formatting tools at any time using:
 
-```bash
+```sh
 black ibis_vega_transform
 jlpm run prettier
 ```
@@ -100,7 +100,7 @@ jlpm run prettier
 
 You can create dashboards from notebooks by using Phoila:
 
-```bash
+```sh
 # Need his PR https://github.com/vidartf/phoila/pull/11
 pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
 phoila install .
