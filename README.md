@@ -62,9 +62,14 @@ so before you run your visualization, click the "Jaeger" icon in the JupyterLab 
 
 You also will likely have to increase the max UDP packet size on your OS to [accomdate for the large logs](https://github.com/jaegertracing/jaeger-client-node/issues/124#issuecomment-324222456):
 
-```sh
 # Mac
+##
+
+```sh
+# Edit now
 sudo sysctl net.inet.udp.maxdgram=200000
+# Edit on restart
+echo net.inet.udp.maxdgram=200000 | sudo tee -a /etc/sysctl.conf
 ```
 
 ## Development
