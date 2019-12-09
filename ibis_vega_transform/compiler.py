@@ -193,4 +193,3 @@ def _cleanup_spec(spec):
     new = copy.deepcopy(spec)
     new["data"] = [data for data in new["data"] if data not in nonreferenced_data]
     return new
-
