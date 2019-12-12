@@ -6,6 +6,7 @@
  */
 
 const fs = require('fs');
+const path = require('path');
 const { setDefaultOptions } = require('expect-puppeteer');
 
 // Extend the time allowed for tests to complete:
@@ -18,23 +19,19 @@ setDefaultOptions({ timeout });
  *
  * @private
  */
-async function setDownloadFolder(folder: string) {
+async function setDownloadFolder() {
   // Create folder for saved images
-  const dir = './images';
+  const dir: string = path.join(__dirname, '/../../../images');
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
-  }
-
-  const dirExample = './images/' + folder;
-  if (!fs.existsSync(dirExample)) {
-    fs.mkdirSync(dirExample);
   }
 
   // Set the download folder for the browser
   await (page as any)._client.send('Page.setDownloadBehavior', {
     behavior: 'allow',
-    downloadPath: dirExample
+    downloadPath: dir
   });
+  return dir;
 }
 
 /**
@@ -48,51 +45,68 @@ function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+async function getElement(selector: string, text: string) {
+  const elements = await page.$$(selector);
+  for (let element of elements) {
+    const elementText = await page.evaluate(el => el.textContent, element);
+    if (elementText.includes(text)) {
+      // console.log(`[${elementText}]`);
+      return element;
+    }
+  }
+}
+
 /**
- * Click on submenu for a give menu.
+ * Click on submenu for a given menu.
  *
  * @private
  * @param menuString - Name of menu (File, Run...)
  * @param itemString - Name of submenu (Run All Cells...)
  */
-async function clickMenuItem(menuString: string, itemString: string) {
+async function clickMenuItem(menuString: string, subMenuString: string) {
   let menuItems: { [index: string]: any } = {
     File: {
-      'Close and Shutdown': { child: 14, popup: 'OK' },
-      'Save Notebook': { child: 18, popup: '' }
+      'Close and  Shutdown Notebook': { popup: 'OK' },
+      'Save Notebook': { popup: '' }
+    },
+    Edit: {
+      'Clear All Outputs': { popup: '' }
     },
     Run: {
-      'Run All Cells': { child: 17, popup: '' }
+      'Run All Cells': { popup: '' }
     },
     Kernel: {
-      'Restart Kernel and Clear All Outputs': { child: 6, popup: 'Restart' }
+      'Restart Kernel and Clear All Outputs': { popup: 'Restart' },
+      'Restart Kernel': { popup: 'Restart' }
     }
   };
-  const childNumber = menuItems[menuString][itemString]['child'];
-  const popupReply = menuItems[menuString][itemString]['popup'];
+  const popupReply = menuItems[menuString][subMenuString]['popup'];
 
-  // Click on menu matching menuString
-  await expect(page).toClick('.p-MenuBar-itemLabel', { text: menuString });
-
-  // Wait for pop up menu to appear
-  await page.waitForFunction(
-    () => !!document.querySelector('.p-MenuBar-menu') !== null,
-    {}
+  const menuElement = await getElement(
+    'li[class="p-MenuBar-item"]',
+    menuString
   );
-  // await page.waitFor(2000);
+  menuElement.click();
+  await page.waitForSelector('.p-MenuBar-menu');
+  await page.waitFor(1 * 1000);
 
-  await expect(page).toClick(
-    `.p-MenuBar-menu > ul > li:nth-child(${childNumber})`
+  const subMenuElement = await getElement(
+    '.p-MenuBar-menu > ul > li[data-type="command"]',
+    subMenuString
   );
+  await page.evaluate(el => (el.style.background = 'red'), subMenuElement);
+  await page.waitFor(1 * 1000);
+  await page.evaluate(el => (el.style.background = ''), subMenuElement);
+  subMenuElement.click();
 
   if (popupReply) {
     await page.waitForFunction(
-      () => !!document.querySelector('.jp-Dialog-content') !== null,
+      () => document.querySelector('.jp-Dialog-content') !== null,
       {}
     );
-    // await page.waitFor(2000);
-    await expect(page).toClick('button', { text: popupReply });
-    await page.waitFor(5000);
+    await page.waitFor(1 * 1000);
+    const button = await getElement('button.jp-Dialog-button', popupReply);
+    button.click();
   }
 }
 
@@ -113,74 +127,96 @@ function checkForPrompt(promptNumber: number) {
   return elements.some(hasPrompt);
 }
 
-/**
- * Checks that a notebook tab with given tabName has been loaded.
- *
- * @private
- * @param tabName - the name of the notebook expected to appear on the tab
- */
-function checkForNotebookTabName(tabName: string) {
-  // TODO
-  const tabs: Element[] = Array.from(
-    document.querySelectorAll('.p-DockPanel-tabBar li')
+function checkForVegaChartAmount(chartAmount: number) {
+  const chartOptionButtons: Element[] = Array.from(
+    document.querySelectorAll('.vega-embed > details > summary')
   );
-  const hasName = (element: Element) =>
-    (<HTMLElement>element).innerText == tabName;
-  return tabs.some(hasName);
+  return chartOptionButtons.length == chartAmount;
+}
+
+/**
+ *
+ * @param file
+ * @param dirExample
+ */
+async function saveCharts(file: string, dirExample: string) {
+  let vegaMenus = await page.$$('.vega-embed > details > summary');
+  let vegaMenuItems = await page.$$(
+    '.vega-embed > details > div > a:nth-child(1)'
+  );
+  for (let index = 0; index < vegaMenus.length; index++) {
+    vegaMenus[index].click();
+    await page.waitFor(2 * 1000);
+    vegaMenuItems[index].click();
+    await page.waitFor(3 * 1000);
+
+    // Rename file
+    let savedImage: string = path.join(dirExample, 'visualization.svg');
+    let renamedImage: string = path.join(dirExample, file + `-${index}.svg`);
+    console.log(`File saved at: ${savedImage}`);
+    console.log(`File renamed to:${renamedImage}`);
+    fs.rename(savedImage, renamedImage, (err: Error) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
 }
 
 describe('Test Ibis-Vega-Transform', () => {
-  beforeAll(async () => {
-    // Load JupyterLab:
-    // await page.goto('http://localhost:8080/lab?reset');
-    // // NOTE: depending on system resource constraints, this may NOT be enough time for JupyterLab to load and get "settled", so to speak. If CI tests begin inexplicably failing due to timeout failures, may want to consider increasing the sleep duration...
-    // await sleep(5 * 1000);
-  });
-
   it.each([
-    // File name, Expected max output prompt, timeout (ms)
-    ['charting-example', 2, 60 * 1000],
+    // File name, Expected max output prompt, chart amount, timeout (ms)
+    // ['charting-example', 2, 1, 60 * 1000],
     // ['ibis-altair-extraction', 8, 30 * 1000],    // FAIL: enable after fix
     // ['interactive-slider.ipynb', 0, 10 * 1000],  // FAIL: enable after fix
-    ['omnisci-vega-example', 3, 10 * 1000],
-    ['vega-compiler', 6, 10 * 1000]
+    // ['omnisci-vega-example', 3, 1, 15 * 1000],
+    ['vega-compiler', 6, 4, 10 * 1000]
   ])(
     'should open notebook correctly',
-    async (file, promptNumber, maxTimeout) => {
-      expect.assertions(8);
-      // await page.goto('http://localhost:8080/lab?reset');
+    async (file, promptNumber, chartAmount, maxTimeout) => {
+      try {
+        // expect.assertions(8);
 
-      // NOTE: depending on system resource constraints, this may NOT be enough time for JupyterLab to load and get "settled", so to speak. If CI tests begin inexplicably failing due to timeout failures, may want to consider increasing the sleep duration...
+        console.log(`\n\n## Running "${file}.ipynb"\n`);
 
-      console.log(`\nRunning "${file}.ipynb"\n`);
+        // Go to specific notebook file
+        await page.goto(
+          `http://localhost:8080/lab/tree/examples/${file}.ipynb`
+        );
+        await page.waitForSelector(
+          '.p-DockPanel-tabBar li[data-type="document-title"]'
+        );
+        await sleep(5 * 1000);
 
-      // Go to specific notebook file
-      await page.goto(`http://localhost:8080/lab/tree/examples/${file}.ipynb`);
-      await page.waitForFunction(
-        checkForNotebookTabName,
-        { timeout: maxTimeout as number },
-        `${file}.ipynb`
-      );
+        // Restart kernel and clear output
+        await clickMenuItem('Kernel', 'Restart Kernel and Clear All Outputs');
+        await page.waitFor(5 * 1000);
 
-      await sleep(5 * 1000);
+        // Run all cells in notebooks
+        await clickMenuItem('Run', 'Run All Cells');
+        await page.waitForFunction(
+          checkForVegaChartAmount,
+          { timeout: maxTimeout as number },
+          chartAmount
+        );
 
-      // Restart kernel and clear output
-      await clickMenuItem('Kernel', 'Restart Kernel and Clear All Outputs');
+        // Check
+        const createdCharts = await page.$$('.vega-embed > details > summary');
+        expect(createdCharts.length).toBe(chartAmount);
 
-      // Run all cells in otebooks
-      await clickMenuItem('Run', 'Run All Cells');
-      await page.waitForFunction(
-        checkForPrompt,
-        { timeout: maxTimeout as number },
-        promptNumber
-      );
+        // Set download folder
+        let dirExample: string = await setDownloadFolder();
+        console.log(`Setting download folder ${dirExample}`);
 
-      // Charts take a little while to appear after the output number prompt has appeared
-      await page.waitFor(5 * 1000);
+        // Clicks and saves image
+        await saveCharts(file as string, dirExample);
 
-      // Close and shutdown
-      await clickMenuItem('File', 'Close and Shutdown');
-      await page.waitFor(4 * 1000);
+        // Close and shutdown
+        await clickMenuItem('File', 'Close and  Shutdown Notebook');
+        await page.waitFor(4 * 1000);
+      } catch (e) {
+        console.log(e);
+      }
     }
   );
 });

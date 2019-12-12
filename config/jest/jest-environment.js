@@ -7,15 +7,23 @@
 
 // Based on from https://yarnpkg.com/en/package/@rws-air/jestscreenshot
 
-const PuppeteerEnvironment = require('jest-environment-puppeteer');
+const PuppeteerEnvironment = require('jest-environment-puppeteer-jsdom');
 
 class CustomEnvironment extends PuppeteerEnvironment {
   async setup() {
-    await super.setup();
+    try {
+      await super.setup();
+    } catch (e) {
+      console.log(e);
+    }
   }
   async teardown() {
-    await this.global.page.waitFor(2000);
-    await super.teardown();
+    try {
+      await this.global.page.waitFor(2000);
+      await super.teardown();
+    } catch (e) {
+      console.log(e);
+    }
   }
 }
 
