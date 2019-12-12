@@ -3,6 +3,7 @@ from typing import *
 import ibis
 from mypy_extensions import TypedDict
 from typing_extensions import Literal
+from ..tracer import tracer
 
 __all__ = ["bin"]
 
@@ -36,8 +37,14 @@ def bin(transform: BinTransform, expr: ibis.Expr) -> ibis.Expr:
     # Precompute min/max or else we get
     # "Expression 'xxx' is not being grouped"
     # errors
-    min_ = extent.min().execute()
-    max_ = extent.max().execute()
+    with tracer.start_span("bin_transform:min") as span:
+        min_expr = extent.min()
+        span.log_kv({"sql": min_expr.compile()})
+        min_ = min_expr.execute()
+    with tracer.start_span("bin_transform:max") as span:
+        max_expr = extent.max()
+        span.log_kv({"sql": max_expr.compile()})
+        max_ = max_expr.execute()
 
     # Cast these to floats to work around
     # https://github.com/ibis-project/ibis/issues/1934
@@ -47,7 +54,6 @@ def bin(transform: BinTransform, expr: ibis.Expr) -> ibis.Expr:
     left = (min_ + (bin_ * binwidth)).name(as_left)
     right = (((min_ + binwidth) + (bin_ * binwidth))).name(as_right)
 
-    # raise ''
     # add the two new fields and remove the initial column
     return expr.mutate(
         [left, right]
