@@ -7,6 +7,8 @@
 
 const fs = require('fs');
 const path = require('path');
+const compare = require('resemblejs').compare;
+
 const { setDefaultOptions } = require('expect-puppeteer');
 
 // Extend the time allowed for tests to complete:
@@ -19,19 +21,24 @@ setDefaultOptions({ timeout });
  *
  * @private
  */
-async function setDownloadFolder() {
+async function setDownloadFolder(base: string, folder: string) {
   // Create folder for saved images
-  const dir: string = path.join(__dirname, '/../../../images');
+  const dir: string = path.join(__dirname, base);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
+  }
+
+  const folderPath: string = path.join(__dirname, base, folder);
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath);
   }
 
   // Set the download folder for the browser
   await (page as any)._client.send('Page.setDownloadBehavior', {
     behavior: 'allow',
-    downloadPath: dir
+    downloadPath: folderPath
   });
-  return dir;
+  return folderPath;
 }
 
 /**
@@ -135,11 +142,12 @@ function checkForVegaChartAmount(chartAmount: number) {
 }
 
 /**
+ * Save charts in notebook
  *
  * @param file
  * @param dirExample
  */
-async function saveCharts(file: string, dirExample: string) {
+async function saveCharts(dirExample: string) {
   let vegaMenus = await page.$$('.vega-embed > details > summary');
   let vegaMenuItems = await page.$$(
     '.vega-embed > details > div > a:nth-child(1)'
@@ -152,9 +160,9 @@ async function saveCharts(file: string, dirExample: string) {
 
     // Rename file
     let savedImage: string = path.join(dirExample, 'visualization.svg');
-    let renamedImage: string = path.join(dirExample, file + `-${index}.svg`);
+    let renamedImage: string = path.join(dirExample, `${index}.svg`);
     console.log(`File saved at: ${savedImage}`);
-    console.log(`File renamed to:${renamedImage}`);
+    console.log(`File renamed to: ${renamedImage}`);
     fs.rename(savedImage, renamedImage, (err: Error) => {
       if (err) {
         console.log(err);
@@ -163,60 +171,122 @@ async function saveCharts(file: string, dirExample: string) {
   }
 }
 
+/**
+ * Save charts in notebook
+ *
+ * @param file
+ * @param dirExample
+ */
+async function compareCharts(
+  dirExample: string,
+  dirOriginal: string,
+  threshold: number
+) {
+  const originalFiles = fs.readdirSync(dirOriginal);
+  const computedFiles = fs.readdirSync(dirExample);
+  const options = {
+    // stop comparing once determined to be > 5% non-matching; this will
+    // also enable compare-only mode and no output image will be rendered;
+    // the combination of these results in a significant speed-up in batch processing
+    returnEarlyThreshold: 5
+  };
+  let results = [];
+
+  for (let index = 0; index < originalFiles.length; index++) {
+    let image1 = path.join(dirOriginal, originalFiles[index]);
+    let image2 = path.join(dirExample, computedFiles[index]);
+
+    console.log(`Comparing images: "${index}.svg"`);
+    console.log(image1);
+    console.log(image2);
+
+    // The parameters can be Node Buffers
+    // data is the same as usual with an additional getBuffer() function
+    compare(image1, image2, options, function(err, data) {
+      if (err) {
+        console.log('An error!');
+      } else {
+        console.log(data);
+        results.push(data['rawMisMatchPercentage']);
+      }
+    });
+  }
+  return results;
+}
+
 describe('Test Ibis-Vega-Transform', () => {
   it.each([
-    // File name, Expected max output prompt, chart amount, timeout (ms)
-    // ['charting-example', 2, 1, 60 * 1000],
-    // ['ibis-altair-extraction', 8, 30 * 1000],    // FAIL: enable after fix
+    // File name, chart amount, timeout (ms)
+    ['charting-example', 1, 60 * 1000],
+    ['ibis-altair-extraction', 4, 30 * 1000],
     // ['interactive-slider.ipynb', 0, 10 * 1000],  // FAIL: enable after fix
-    // ['omnisci-vega-example', 3, 1, 15 * 1000],
-    ['vega-compiler', 6, 4, 10 * 1000]
+    ['omnisci-vega-example', 1, 15 * 1000],
+    ['performance-charts', 2, 15 * 1000],
+    ['vega-compiler', 4, 60 * 1000]
   ])(
-    'should open notebook correctly',
-    async (file, promptNumber, chartAmount, maxTimeout) => {
-      try {
-        // expect.assertions(8);
+    'should open and run notebook correctly',
+    async (file, chartAmount, maxTimeout) => {
+      console.log(`\n\n## Running "${file}.ipynb"\n`);
 
-        console.log(`\n\n## Running "${file}.ipynb"\n`);
+      // Go to specific notebook file
+      await page.goto(`http://localhost:8080/lab/tree/examples/${file}.ipynb`);
+      await page.waitForSelector(
+        '.p-DockPanel-tabBar li[data-type="document-title"]'
+      );
+      await sleep(5 * 1000);
 
-        // Go to specific notebook file
-        await page.goto(
-          `http://localhost:8080/lab/tree/examples/${file}.ipynb`
-        );
-        await page.waitForSelector(
-          '.p-DockPanel-tabBar li[data-type="document-title"]'
-        );
-        await sleep(5 * 1000);
+      // Restart kernel and clear output
+      await clickMenuItem('Kernel', 'Restart Kernel and Clear All Outputs');
+      await page.waitFor(5 * 1000);
 
-        // Restart kernel and clear output
-        await clickMenuItem('Kernel', 'Restart Kernel and Clear All Outputs');
-        await page.waitFor(5 * 1000);
+      // Run all cells in notebooks
+      await clickMenuItem('Run', 'Run All Cells');
+      await page.waitForFunction(
+        checkForVegaChartAmount,
+        { timeout: maxTimeout as number },
+        chartAmount
+      );
 
-        // Run all cells in notebooks
-        await clickMenuItem('Run', 'Run All Cells');
-        await page.waitForFunction(
-          checkForVegaChartAmount,
-          { timeout: maxTimeout as number },
-          chartAmount
-        );
+      // Check amount of charts is correct
+      const createdCharts = await page.$$('.vega-embed > details > summary');
+      expect(createdCharts.length).toBe(chartAmount);
+      console.log(createdCharts.length);
+      await page.waitFor(2 * 1000);
 
-        // Check
-        const createdCharts = await page.$$('.vega-embed > details > summary');
-        expect(createdCharts.length).toBe(chartAmount);
+      // Set download folder
+      let folderPath: string = await setDownloadFolder(
+        '/../../../images',
+        file as string
+      );
+      console.log(`Setting download folder: ${folderPath}`);
 
-        // Set download folder
-        let dirExample: string = await setDownloadFolder();
-        console.log(`Setting download folder ${dirExample}`);
+      // Save images
+      await saveCharts(folderPath);
+      await page.waitFor(2 * 1000);
 
-        // Clicks and saves image
-        await saveCharts(file as string, dirExample);
+      // Check amount of files saved is correct
+      const amountOfFile = fs.readdirSync(folderPath);
+      expect(amountOfFile.length).toBe(chartAmount);
 
-        // Close and shutdown
-        await clickMenuItem('File', 'Close and  Shutdown Notebook');
-        await page.waitFor(4 * 1000);
-      } catch (e) {
-        console.log(e);
-      }
+      // Compare images
+      let threshold = 1.0;
+      let originalImagesPath: string = await setDownloadFolder(
+        '/../../images',
+        file as string
+      );
+      console.log(`Original images folder: ${originalImagesPath}`);
+      let results = await compareCharts(
+        folderPath,
+        originalImagesPath,
+        threshold
+      );
+      const isBelowThreshold = value => value < threshold;
+      expect(results.every(isBelowThreshold)).toBe(true);
+      await page.waitFor(2 * 1000);
+
+      // Close and shutdown
+      await clickMenuItem('File', 'Close and  Shutdown Notebook');
+      await page.waitFor(4 * 1000);
     }
   );
 });

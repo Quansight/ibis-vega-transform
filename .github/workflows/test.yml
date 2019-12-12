@@ -53,8 +53,13 @@ jobs:
           eval "$(conda shell.bash hook)"
           conda activate ibis-vega-transform
           xvfb-run --auto-servernum npm test
-      - name: Upload images
+      - name: Upload generated images
         uses: actions/upload-artifact@v1
         with:
-          name: images
-          path: /home/runner/work/images
+          name: generated-images
+          path: /home/runner/work/ibis-vega-transform/images/
+      - name: Upload original images
+        uses: actions/upload-artifact@v1
+        with:
+          name: orignal-images
+          path: /home/runner/work/ibis-vega-transform/ibis-vega-transform/images/

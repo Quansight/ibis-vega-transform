@@ -5,16 +5,16 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
+const portNumber = 8080;
 const config = {
   launch: {
     headless: false,
     slowMo: process.env.SLOWMO === 'true'
-    // executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
   },
   // https://github.com/smooth-code/jest-puppeteer/tree/master/packages/jest-dev-server#options
   server: {
-    command: "jupyter lab --port 8081 --no-browser --LabApp.token=''",
-    port: 8081,
+    command: `jupyter lab --port ${portNumber} --no-browser --LabApp.token=''`,
+    port: portNumber,
     launchTimeout: 10 * 1000
   }
 };

@@ -57,7 +57,7 @@ install the `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshan
 lab extension to see the Jaeger icon in the launcher.
 
 ```bash
-conda install -c conda-forge
+conda install jaeger -c conda-forge
 jupyter labextension install jupyterlab-server-proxy-saulshanabrook
 ```
 

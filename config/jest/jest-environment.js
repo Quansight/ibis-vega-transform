@@ -11,19 +11,11 @@ const PuppeteerEnvironment = require('jest-environment-puppeteer-jsdom');
 
 class CustomEnvironment extends PuppeteerEnvironment {
   async setup() {
-    try {
-      await super.setup();
-    } catch (e) {
-      console.log(e);
-    }
+    await super.setup();
   }
   async teardown() {
-    try {
-      await this.global.page.waitFor(2000);
-      await super.teardown();
-    } catch (e) {
-      console.log(e);
-    }
+    await this.global.page.waitFor(2000);
+    await super.teardown();
   }
 }
 
