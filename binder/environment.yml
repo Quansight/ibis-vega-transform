@@ -2,10 +2,8 @@ name: ibis-vega-transform
 channels:
   - conda-forge
 dependencies:
-  - pymapd
-  - nodejs
-  - python>=3.7
   - jupyterlab
+  - pymapd
+  - python>=3.7
+  - nodejs=12
   - notebook<6.0
-  - jaeger
-
