@@ -250,7 +250,7 @@ describe('Test Ibis-Vega-Transform', () => {
       // Check amount of charts is correct
       const createdCharts = await page.$$('.vega-embed > details > summary');
       expect(createdCharts.length).toBe(chartAmount);
-      console.log(createdCharts.length);
+      console.log(`Found charts: ${createdCharts.length}`);
       await page.waitFor(2 * 1000);
 
       // Set download folder
