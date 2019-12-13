@@ -56,12 +56,10 @@ If you want to see traces of the interactiosn for debugging and performance anal
 install the `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshanabrook`
 lab extension to see the Jaeger icon in the launcher.
 
-
 ```bash
-conda install -c conda-forge
+conda install jaeger -c conda-forge
 jupyter labextension install jupyterlab-server-proxy-saulshanabrook
 ```
-
 
 The Jaeger server won't actually be started until a HTTP request is sent to it,
 so before you run your visualization, click the "Jaeger" icon in the JupyterLab launcher or go to
@@ -70,6 +68,7 @@ so before you run your visualization, click the "Jaeger" icon in the JupyterLab 
 You also will likely have to increase the max UDP packet size on your OS to [accomdate for the large logs](https://github.com/jaegertracing/jaeger-client-node/issues/124#issuecomment-324222456):
 
 # Mac
+
 ##
 
 ```sh
