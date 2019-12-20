@@ -15,44 +15,24 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v1.2.0
-      - name: Set up Conda
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda config --set always_yes yes --set changeps1 no
-          conda update conda -q
-      - name: Conda info
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda info
-      - name: Create Conda test environment
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda env create -f binder/environment.yml
-          conda activate ibis-vega-transform
+      - name: Setup conda
+        uses: goanpeca/setup-miniconda@v1
+        with:
+          activate-environment: ibis-vega-transform
+          environment-file: binder/environment.yml
       - name: List Conda packages
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate ibis-vega-transform
-          conda list
+        shell: bash -l {0}
+        run: conda list
       - name: Install Ibis Vega Transform extension
-        shell: bash
+        shell: bash -l {0}
         run: |
-          eval "$(conda shell.bash hook)"
-          conda activate ibis-vega-transform
           pip install -e .[dev]
           jlpm
           jupyter labextension install . --no-build
           jupyter lab build
       - name: Test example notebooks
-        shell: bash
-        run: |
-          eval "$(conda shell.bash hook)"
-          conda activate ibis-vega-transform
-          xvfb-run --auto-servernum npm test
+        shell: bash -l {0}
+        run: xvfb-run --auto-servernum npm test
       - name: Upload generated images
         uses: actions/upload-artifact@v1
         with:
