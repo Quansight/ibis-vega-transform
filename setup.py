@@ -21,7 +21,7 @@ setuptools.setup(
     install_requires=[
         "jupyterlab",
         "altair-transform",
-        "altair",
+        "altair~=4.0.0",
         "vega_datasets",
         "ibis-framework",
         "pymapd",
@@ -29,7 +29,7 @@ setuptools.setup(
         "mypy_extensions",
         "typing_extensions",
         "jaeger-client",
-        "jupyter_jaeger",
+        "jupyter_jaeger~=1.0.3",
     ],
     extras_require={"dev": ["black"]},
     python_requires=">=3.6",

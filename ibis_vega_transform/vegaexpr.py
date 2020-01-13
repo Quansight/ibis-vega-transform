@@ -58,6 +58,25 @@ def not_equal_operator(l, r):
     return not_operator(equal_operator(l, r))
 
 
+def unary_add_operator(v):
+    """
+    The unary plus operator precedes its operand and evaluates to its operand but attempts to convert it into a number, if it isn't already.
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators#Unary_plus_2
+    """
+    if isinstance(v, (int, float, it.NumericValue)):
+        return v
+    if isinstance(v, ibis.expr.types.ValueExpr):
+        return v.cast("double")
+    try:
+        return int(v)
+    except ValueError:
+        try:
+            return float(v)
+        except ValueError:
+            return
+
+
+altair_transform.utils._evaljs.UNARY_OPERATORS["+"] = unary_add_operator
 altair_transform.utils._evaljs.UNARY_OPERATORS["!"] = not_operator
 altair_transform.utils._evaljs.BINARY_OPERATORS["&&"] = and_operator
 altair_transform.utils._evaljs.BINARY_OPERATORS["||"] = or_operator
@@ -397,6 +416,37 @@ def vlSelectionTest(
     )
 
 
+def isValid(value):
+    """
+    Returns true if value is not null, undefined, or NaN, false otherwise.
+
+    https://vega.github.io/vega/docs/expressions/#isValid
+    """
+
+    if value is None or (isinstance(value, float) and math.isnan(value)):
+        return False
+    if isinstance(value, ibis.expr.types.ValueExpr):
+        return ~value.isnull()
+    return True
+
+
+def isFinite(value):
+    """
+    Returns true if value is a finite number. Same as JavaScript’s Number.isFinite.
+
+    https://vega.github.io/vega/docs/expressions/#isFinite
+    https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number/isFinite
+    """
+
+    if isinstance(value, float) and math.isnan(value):
+        return False
+    if isinstance(value, (int, float)):
+        return True
+    if isinstance(value, ibis.expr.types.NumericValue):
+        return ~value.isnull()
+    return False
+
+
 # From https://vega.github.io/vega/docs/expressions/
 VEGAJS_NAMESPACE: Dict[str, Any] = {
     # Constants
@@ -463,7 +513,9 @@ VEGAJS_NAMESPACE: Dict[str, Any] = {
     "timezoneoffset": timezoneoffset,
     "utc": utc,
     "length": len,
-    "vlSelectionTest": vlSelectionTest
+    "vlSelectionTest": vlSelectionTest,
+    "isValid": isValid,
+    "isFinite": isFinite
     # TODOs:
     # Remaining Date/Time Functions
     # Array Functions
