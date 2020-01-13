@@ -128,8 +128,10 @@ for benchmarking.
 First create a test environment:
 
 ```bash
-conda create -n tmp -c conda-forge nodejs pip wheel twine
+conda env remove -n tmp --yes
+conda env create -f binder/environment.yml --name tmp
 conda activate tmp
+conda install -c conda-forge wheel twine black
 ```
 
 Then bump the Python version in `setup.py` and upload a test version:
@@ -173,6 +175,9 @@ npm publish out.tgz
 And add a git tag for the release and push:
 
 ```bash
+rm out.tgz
+git add package.json setup.py
+git commit -m 'Version <new version>'
 git tag <new version>
 git push
 git push --tags
