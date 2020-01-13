@@ -9,7 +9,7 @@ def read(path, encoding="utf-8"):
 
 setuptools.setup(
     name="ibis-vega-transform",
-    version="2.0.1",
+    version="3.0.0",
     url="https://github.com/Quansight/ibis-vega-transform",
     author="Ian Rose and Saul Shanabrook",
     author_email="ian.rose@quansight.com",
