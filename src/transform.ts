@@ -27,16 +27,69 @@ function parseDates(o: { [key: string]: any }): { [key: string]: any } {
   return n;
 }
 
+async function getData(parameters: any): Promise<any> {
+  const { tracing } = QueryIbis;
+  const spanExtract = tracing
+    ? await client.startSpanExtract({
+        name: 'transform',
+        relationship: 'follows_from',
+        reference: parameters.span
+      })
+    : null;
+
+  const kernel = QueryIbis.kernel;
+  if (!kernel) {
+    console.error('Not connected to kernel');
+    return;
+  }
+
+  const commSpan = tracing
+    ? await client.startSpan({
+        name: 'comm:queryibis',
+        reference: spanExtract!,
+        relationship: 'child_of'
+      })
+    : null;
+
+  // Fetch the query results from the kernel.
+  const comm = kernel.connectToComm('queryibis');
+
+  const resultPromise = new PromiseDelegate<JSONObject[]>();
+  comm.onMsg = msg =>
+    resultPromise.resolve((msg.content.data as any) as JSONObject[]);
+
+  // set span inside comm to be this comm message instead of root span
+  if (tracing) {
+    parameters = { ...parameters, span: await client.injectSpan(commSpan!) };
+  }
+
+  await comm.open(parameters).done;
+  const result: JSONObject[] = await resultPromise.promise;
+
+  if (tracing) {
+    await client.finishSpan(commSpan!);
+  }
+  const parsedResult = result.map(parseDates);
+
+  if (tracing) {
+    await client.finishSpan(spanExtract!);
+  }
+  return parsedResult;
+}
+
 const TRANSFORM = 'queryibis';
 
 /**
  * Generates a function to query data from an OmniSci Core database.
  * @param {object} params - The parameters for this operator.
+ *
+ * Inspired by load transform
+ * https://github.com/vega/vega/blob/master/packages/vega-transforms/src/Load.js
  */
 class QueryIbis extends dataflow.Transform implements vega.Transform {
   constructor(params: any) {
-    console.log(params);
     super([], params);
+    this._pending = null;
   }
 
   /**
@@ -82,73 +135,35 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
     ]
   };
 
-  get value(): any {
-    return this._value;
+  transform(parameters: any, pulse: any): any {
+    if (this._pending) {
+      // update state and return pulse
+      return this.output(pulse, this._pending);
+    }
+
+    // return promise for non-blocking async loading
+    const p = getData(parameters).then(res => {
+      this._pending = res;
+      return (df: any) => df.touch(this);
+    });
+    return { async: p };
   }
-  set value(val: any) {
-    this._value = val;
-  }
 
-  async transform(parameters: any, pulse: any): Promise<any> {
-    const { tracing } = QueryIbis;
-    const spanExtract = tracing
-      ? await client.startSpanExtract({
-          name: 'transform',
-          relationship: 'follows_from',
-          reference: parameters.span
-        })
-      : null;
-
-    const kernel = QueryIbis.kernel;
-    if (!kernel) {
-      console.error('Not connected to kernel');
-      return;
-    }
-
-    const commSpan = tracing
-      ? await client.startSpan({
-          name: 'comm:queryibis',
-          reference: spanExtract!,
-          relationship: 'child_of'
-        })
-      : null;
-
-    // Fetch the query results from the kernel.
-    const comm = kernel.connectToComm('queryibis');
-
-    const resultPromise = new PromiseDelegate<JSONObject[]>();
-    comm.onMsg = msg =>
-      resultPromise.resolve((msg.content.data as any) as JSONObject[]);
-
-    // set span inside comm to be this comm message instead of root span
-    if (tracing) {
-      parameters = { ...parameters, span: await client.injectSpan(commSpan!) };
-    }
-
-    await comm.open(parameters).done;
-    const result: JSONObject[] = await resultPromise.promise;
-
-    if (tracing) {
-      await client.finishSpan(commSpan!);
-    }
-
-    const parsedResult = result.map(parseDates);
-
-    // Ingest the data and push it into the dataflow graph.
-    parsedResult.forEach(dataflow.ingest);
-
-    /* tslint:disable-next-line */
+  /**
+   * Copied from
+   * https://github.com/vega/vega/blob/d5b979955f67c9557b97eb5ddebb3fef48fe736c/packages/vega-transforms/src/Load.js#L52-L59
+   */
+  output(pulse: any, data: any) {
+    data.forEach(dataflow.ingest);
     const out = pulse.fork(pulse.NO_FIELDS & pulse.NO_SOURCE);
-    out.rem = this._value;
-    this._value = out.add = out.source = parsedResult;
-
-    if (tracing) {
-      await client.finishSpan(spanExtract!);
-    }
+    out.rem = this.value;
+    this.value = out.source = out.add = data;
+    this._pending = null;
     return out;
   }
 
-  private _value: any;
+  private _pending: Promise<any> | null;
+  private value: any;
 }
 
 export default QueryIbis;
