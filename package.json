@@ -84,7 +84,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "black ibis_vega_transform && jlpm run prettier && git add ."
+      "pre-commit": "black ibis_vega_transform && jlpm run prettier"
     }
   }
 }
