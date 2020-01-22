@@ -49,7 +49,6 @@
     "vega-lite": "4.0.2"
   },
   "devDependencies": {
-    "@rws-air/jestscreenshot": "^3.0.3",
     "@types/expect-puppeteer": "^3.3.2",
     "@types/jaeger-client": "3.15.3",
     "@types/jest": "^24.0.25",

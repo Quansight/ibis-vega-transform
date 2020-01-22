@@ -25,7 +25,7 @@ setuptools.setup(
         "vega_datasets",
         "ibis-framework",
         "pymapd",
-        "tornado<6",
+        "tornado",
         "mypy_extensions",
         "typing_extensions",
         "jaeger-client",
