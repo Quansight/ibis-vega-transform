@@ -29,23 +29,23 @@ function parseDates(o: { [key: string]: any }): { [key: string]: any } {
 
 /**
  * The possible states our transform can be in.
- * 
+ *
  * The idea here is that after a transform finished fetching data,
  * it saves that data on the instance and triggers a new round.
- * 
+ *
  * When this new round hits, we know we just computed some data, so we can update it.
- * 
- * 
+ *
+ *
  * The tricky part is what if the user has an update while the data is being fetched?
  * In that case, we wanna stop fetching ASAP and abort that transaction.
- * 
+ *
  * This is why we have the `aborted` property on the fetching state. We can set that to `true`
  * if we get a newer message before the data has been fetched, which should cause it to stop
  * and not return any results.
- * 
+ *
  * This assumes that if the by calling `df.touch` the next cycle will be caused just by this
  * not by some user input.
- * 
+ *
  * If this is not the case (if vega collapses cycles for performance) we should instead save some hash
  * of the parameters and verify they are equal to the current ones.
  */
