@@ -13,7 +13,7 @@ jaeger_config = jaeger_client.Config(
         # Send each trace one by one, dont wait for next
         # Need this b/c eventloop stops once cell is done executing
         # in jupyter
-        "reporter_batch_size": 1
+        "reporter_batch_size": 1,
     },
     service_name=os.environ.get("JAEGER_SERVICE_NAME", "kernel"),
     validate=True,
