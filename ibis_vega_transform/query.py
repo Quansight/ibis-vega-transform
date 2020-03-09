@@ -4,6 +4,9 @@ Functionality for server-side ibis transforms of vega charts.
 import json
 import re
 import typing
+import concurrent.futures
+import ibis.client
+import ibis.mapd
 
 import altair
 import altair.vegalite.v3.display
@@ -15,6 +18,37 @@ from .tracer import tracer
 
 __all__ = ["query_target_func"]
 
+executor = concurrent.futures.ThreadPoolExecutor()
+
+
+# We need a new connection per thread, which is too memory intensive
+# Should just create one per threadpool and then reuse
+# But for now we just disable
+
+ENABLE_MULTIPROCESSING = False
+
+def execute_new_client(expr):
+    """
+    Execute with new connection b/c connections are not threadsafe
+    """
+    (backend,) = list(ibis.client.find_backends(expr))
+    assert isinstance(backend, ibis.mapd.MapDClient)
+    with tracer.start_span("ibis:execute:new-client") as execute_span:
+        new_client = ibis.mapd.MapDClient(
+            uri=backend.uri,
+            host=backend.host,
+            port=backend.port,
+            user=backend.user,
+            protocol=backend.protocol,
+            session_id=backend.session_id,
+            database=backend.db_name,
+            password=backend.password,
+        )
+    with new_client:
+        return new_client.execute(expr)
+
+    # reset db name so it reconnects
+
 
 def query_target_func(comm, msg):
     """
@@ -22,6 +56,17 @@ def query_target_func(comm, msg):
     """
     # These are the paramaters passed to the vega transform
     parameters: dict = msg["content"]["data"]
+
+    def callback(future):
+        comm.send(future.result())
+
+    if ENABLE_MULTIPROCESSING:
+        executor.submit(execute_query, parameters).add_done_callback(callback)
+    else:
+        comm.send(execute_query(parameters))
+
+
+def execute_query(parameters: dict):
     injected_span: object = parameters.pop("span")
     with tracer.start_active_span(
         "queryibis",
@@ -61,8 +106,11 @@ def query_target_func(comm, msg):
                 )
         with tracer.start_span("ibis:execute") as execute_span:
             execute_span.log_kv({"sql": expr.compile()})
-            data = expr.execute()
-        comm.send(altair.to_values(data)["values"])
+            if ENABLE_MULTIPROCESSING:
+                data = execute_new_client(expr)
+            else:
+                data = expr.execute()
+        return altair.to_values(data)["values"]
 
 
 def _patch_vegaexpr(expr: str, name: str, value: str) -> str:

@@ -27,16 +27,116 @@ function parseDates(o: { [key: string]: any }): { [key: string]: any } {
   return n;
 }
 
+/**
+ * The possible states our transform can be in.
+ *
+ * The idea here is that after a transform finished fetching data,
+ * it saves that data on the instance and triggers a new round.
+ *
+ * When this new round hits, we know we just computed some data, so we can update it.
+ *
+ *
+ * The tricky part is what if the user has an update while the data is being fetched?
+ * In that case, we wanna stop fetching ASAP and abort that transaction.
+ *
+ * This is why we have the `aborted` property on the fetching state. We can set that to `true`
+ * if we get a newer message before the data has been fetched, which should cause it to stop
+ * and not return any results.
+ *
+ * This assumes that if the by calling `df.touch` the next cycle will be caused just by this
+ * not by some user input.
+ *
+ * If this is not the case (if vega collapses cycles for performance) we should instead save some hash
+ * of the parameters and verify they are equal to the current ones.
+ */
+const enum StateEnum {
+  initial = 'initial',
+  fetching = 'fetching',
+  fetched = 'fetched'
+}
+
+type State =
+  | { state: StateEnum.initial }
+  | { state: StateEnum.fetching; aborted: boolean }
+  | { state: StateEnum.fetched; data: Array<object> };
+
+async function getData(
+  parameters: any,
+  abortSignal: { aborted: boolean }
+): Promise<null | Array<object>> {
+  const { tracing, kernel } = QueryIbis;
+  if (!kernel) {
+    throw new Error('Not connected to any kernel');
+  }
+  const spanExtract = tracing
+    ? await client.startSpanExtract({
+        name: 'transform',
+        relationship: 'follows_from',
+        reference: parameters.span
+      })
+    : null;
+
+  const cleanup = async () => {
+    if (tracing) {
+      await client.finishSpan(spanExtract!);
+    }
+  };
+
+  if (abortSignal.aborted) {
+    await cleanup();
+    return null;
+  }
+
+  // Fetch the query results from the kernel.
+  const comm = kernel.connectToComm('queryibis');
+
+  const resultPromise = new PromiseDelegate<JSONObject[]>();
+  comm.onMsg = msg =>
+    resultPromise.resolve((msg.content.data as any) as JSONObject[]);
+
+  // set span inside comm to be this comm message instead of root span
+  if (tracing) {
+    parameters = { ...parameters, span: await client.injectSpan(spanExtract!) };
+  }
+  if (abortSignal.aborted) {
+    await cleanup();
+    return null;
+  }
+
+  await comm.open(parameters).done;
+
+  if (abortSignal.aborted) {
+    await cleanup();
+    return null;
+  }
+
+  const result: JSONObject[] = await resultPromise.promise;
+  if (abortSignal.aborted) {
+    await cleanup();
+    return null;
+  }
+  const parsedResult = result.map(parseDates);
+
+  await cleanup();
+  if (abortSignal.aborted) {
+    return null;
+  }
+  return parsedResult;
+}
+
 const TRANSFORM = 'queryibis';
 
 /**
  * Generates a function to query data from an OmniSci Core database.
  * @param {object} params - The parameters for this operator.
+ *
+ * Inspired by load transform
+ * https://github.com/vega/vega/blob/master/packages/vega-transforms/src/Load.js
  */
 class QueryIbis extends dataflow.Transform implements vega.Transform {
   constructor(params: any) {
-    console.log(params);
     super([], params);
+    this._state = { state: StateEnum.initial };
   }
 
   /**
@@ -82,73 +182,43 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
     ]
   };
 
-  get value(): any {
-    return this._value;
+  transform(parameters: any, pulse: any): any {
+    if (this._state.state === StateEnum.fetched) {
+      // update state and return pulse
+      return this.output(pulse, this._state.data);
+    }
+    if (this._state.state === StateEnum.fetching) {
+      this._state.aborted = true;
+    }
+
+    this._state = { state: StateEnum.fetching, aborted: false };
+
+    // return promise for non-blocking async loading
+    const p = getData(parameters, this._state).then(res => {
+      if (res) {
+        this._state = { state: StateEnum.fetched, data: res };
+        return (df: any) => df.touch(this);
+      }
+      return () => {};
+    });
+    return { async: p };
   }
-  set value(val: any) {
-    this._value = val;
-  }
 
-  async transform(parameters: any, pulse: any): Promise<any> {
-    const { tracing } = QueryIbis;
-    const spanExtract = tracing
-      ? await client.startSpanExtract({
-          name: 'transform',
-          relationship: 'follows_from',
-          reference: parameters.span
-        })
-      : null;
-
-    const kernel = QueryIbis.kernel;
-    if (!kernel) {
-      console.error('Not connected to kernel');
-      return;
-    }
-
-    const commSpan = tracing
-      ? await client.startSpan({
-          name: 'comm:queryibis',
-          reference: spanExtract!,
-          relationship: 'child_of'
-        })
-      : null;
-
-    // Fetch the query results from the kernel.
-    const comm = kernel.connectToComm('queryibis');
-
-    const resultPromise = new PromiseDelegate<JSONObject[]>();
-    comm.onMsg = msg =>
-      resultPromise.resolve((msg.content.data as any) as JSONObject[]);
-
-    // set span inside comm to be this comm message instead of root span
-    if (tracing) {
-      parameters = { ...parameters, span: await client.injectSpan(commSpan!) };
-    }
-
-    await comm.open(parameters).done;
-    const result: JSONObject[] = await resultPromise.promise;
-
-    if (tracing) {
-      await client.finishSpan(commSpan!);
-    }
-
-    const parsedResult = result.map(parseDates);
-
-    // Ingest the data and push it into the dataflow graph.
-    parsedResult.forEach(dataflow.ingest);
-
-    /* tslint:disable-next-line */
+  /**
+   * Copied from
+   * https://github.com/vega/vega/blob/d5b979955f67c9557b97eb5ddebb3fef48fe736c/packages/vega-transforms/src/Load.js#L52-L59
+   */
+  output(pulse: any, data: any) {
+    data.forEach(dataflow.ingest);
     const out = pulse.fork(pulse.NO_FIELDS & pulse.NO_SOURCE);
-    out.rem = this._value;
-    this._value = out.add = out.source = parsedResult;
-
-    if (tracing) {
-      await client.finishSpan(spanExtract!);
-    }
+    out.rem = this.value;
+    this.value = out.source = out.add = data;
+    this._state = { state: StateEnum.initial };
     return out;
   }
 
-  private _value: any;
+  private _state: State;
+  private value: any;
 }
 
 export default QueryIbis;
