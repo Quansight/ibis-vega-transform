@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v1.2.0
+        uses: actions/checkout@v1
       - name: Setup conda
         uses: goanpeca/setup-miniconda@v1
         with:
@@ -26,7 +26,7 @@ jobs:
       - name: Install Ibis Vega Transform extension
         shell: bash -l {0}
         run: |
-          pip install -e .[dev]
+          pip install -e ".[dev]"
           jlpm
           jupyter labextension install . --no-build
           jupyter lab build

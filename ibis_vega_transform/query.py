@@ -6,7 +6,7 @@ import re
 import typing
 import concurrent.futures
 import ibis.client
-import ibis.mapd
+import ibis.omniscidb
 
 import altair
 import altair.vegalite.v3.display
@@ -27,14 +27,15 @@ executor = concurrent.futures.ThreadPoolExecutor()
 
 ENABLE_MULTIPROCESSING = False
 
+
 def execute_new_client(expr):
     """
     Execute with new connection b/c connections are not threadsafe
     """
     (backend,) = list(ibis.client.find_backends(expr))
-    assert isinstance(backend, ibis.mapd.MapDClient)
+    assert isinstance(backend, ibis.omniscidb.OmniSciDBClient)
     with tracer.start_span("ibis:execute:new-client") as execute_span:
-        new_client = ibis.mapd.MapDClient(
+        new_client = ibis.omniscidb.OmniSciDBClient(
             uri=backend.uri,
             host=backend.host,
             port=backend.port,
