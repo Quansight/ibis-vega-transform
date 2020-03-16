@@ -89,7 +89,7 @@ cd ibis-vega-transform
 conda env create -f binder/environment.yml
 conda activate ibis-vega-transform
 
-pip install -e .[dev]
+pip install -e ".[dev]"
 jlpm
 jupyter labextension install . --no-build
 
