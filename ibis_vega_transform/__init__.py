@@ -34,7 +34,7 @@ def _to_version_info(version):
     return tuple(parts)
 
 
-__version__ = "3.0.0.dev0"
+__version__ = "4.0.0.dev0"
 version_info = _to_version_info(__version__)
 
 
