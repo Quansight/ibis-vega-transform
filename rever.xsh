@@ -73,12 +73,17 @@ def get_version(version_type, module=$MODULE):
     version_type = version_type.lower()
     if version_type == 'major':
         major += 1
+        minor = 0
+        patch = 0
     elif version_type == 'minor':
         minor += 1
+        patch = 0
     elif version_type == 'patch':
         patch += 1
     elif version_type in ['check', 'setup']:
         pass
+    elif len(version_type.split('.')) == 3:
+        major, minor, patch = version_type.split('.')
     else:
         raise Exception('Invalid option! Must provide version type: [major|minor|patch]')
 
@@ -86,7 +91,9 @@ def get_version(version_type, module=$MODULE):
     minor = str(minor)
     patch = str(patch)
     version = '.'.join([major, minor, patch])
-    print('\n\nReleasing version {}\n\n'.format(version))
+
+    if version_type not in ['check', 'setup']:
+        print('\n\nReleasing version {}\n\n'.format(version))
 
     return version
 
