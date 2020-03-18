@@ -1,5 +1,5 @@
-import { IRenderMime } from '@jupyterlab/rendermime';
-import { Widget } from '@phosphor/widgets';
+import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
+import { Widget } from '@lumino/widgets';
 import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
@@ -9,6 +9,8 @@ import { Kernel } from '@jupyterlab/services';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';
 
+const CLASS_NAME = 'mimerenderer-ibis-vega';
+
 /**
  * An alternative vega renderer that can query the server for lazy
  * evaluations of ibis expressions targeting SQL-like backends.
@@ -17,11 +19,15 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
   /**
    * Construct a new renderer.
    */
+  _mimeType: string;
   constructor(
-    private getKernel: () => Promise<Kernel.IKernelConnection | null>,
+    options: IRenderMime.IRendererOptions,
+    private getKernel: () => Promise<Kernel.IKernelConnection | undefined | null>,
     private tracing: boolean
   ) {
     super();
+    this._mimeType = options.mimeType;
+    this.addClass(CLASS_NAME);
   }
 
   /**

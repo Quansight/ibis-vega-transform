@@ -1,5 +1,5 @@
 import { Kernel } from '@jupyterlab/services';
-import { JSONObject, PromiseDelegate } from '@phosphor/coreutils';
+import { JSONObject, PromiseDelegate } from '@lumino/coreutils';
 import * as vega from 'vega';
 import * as dataflow from 'vega-dataflow';
 import { client } from 'jupyter-jaeger';
@@ -88,10 +88,10 @@ async function getData(
   }
 
   // Fetch the query results from the kernel.
-  const comm = kernel.connectToComm('queryibis');
+  const comm = kernel.createComm('queryibis');
 
   const resultPromise = new PromiseDelegate<JSONObject[]>();
-  comm.onMsg = msg =>
+  comm.onMsg = (msg: { content: { data: any } }) =>
     resultPromise.resolve((msg.content.data as any) as JSONObject[]);
 
   // set span inside comm to be this comm message instead of root span
@@ -142,7 +142,7 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
   /**
    * The current kernel instance for the QueryIbis transform.
    */
-  static kernel: Kernel.IKernelConnection | null;
+  static kernel: Kernel.IKernelConnection | undefined;
 
   /**
    * Whether to record traces

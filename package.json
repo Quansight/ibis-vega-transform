@@ -35,18 +35,18 @@
     "test:debug": "env HEADLESS=false SLOWMO=true jlpm test"
   },
   "dependencies": {
-    "@jupyterlab/application": "^1.0.0",
-    "@jupyterlab/docregistry": "^1.0.4",
-    "@jupyterlab/notebook": "^1.0.4",
-    "@jupyterlab/rendermime": "^1.0.4",
-    "@jupyterlab/services": "^4.0.4",
-    "@phosphor/coreutils": "^1.3.1",
-    "@phosphor/widgets": "^1.9.0",
+    "@jupyterlab/application": "^2.0.2",
+    "@jupyterlab/docregistry": "^2.0.2",
+    "@jupyterlab/notebook": "^2.0.2",
+    "@jupyterlab/rendermime-interfaces": "^2.0.1",
+    "@jupyterlab/services": "^5.0.2",
+    "@lumino/coreutils": "^1.4.2",
+    "@lumino/widgets": "^1.11.1",
     "jupyter-jaeger": "^1.0.1",
     "phoila": "^0.3.0",
-    "vega": "5.9.0",
-    "vega-embed": "6.2.1",
-    "vega-lite": "4.0.2"
+    "vega": "5.10.0",
+    "vega-embed": "6.5.1",
+    "vega-lite": "4.7.0"
   },
   "devDependencies": {
     "@types/expect-puppeteer": "^3.3.2",

@@ -3,7 +3,7 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { INotebookTracker } from '@jupyterlab/notebook';
-import { TVoilaTracker } from 'phoila/lib/tokens';
+// import { TVoilaTracker } from 'phoila/lib/tokens';
 import { IbisVegaRenderer, MIME_TYPE } from './renderer';
 
 /**
@@ -17,7 +17,7 @@ const PLUGIN_ID = 'ibis-vega-transform:plugin';
 const plugin: JupyterFrontEndPlugin<void> = {
   activate,
   id: PLUGIN_ID,
-  optional: [INotebookTracker, TVoilaTracker],
+  // optional: [INotebookTracker, TVoilaTracker],
   autoStart: true
 };
 
@@ -29,36 +29,40 @@ const plugin: JupyterFrontEndPlugin<void> = {
 function activate(
   _: JupyterFrontEnd,
   notebooks: INotebookTracker | null,
-  voila: TVoilaTracker | null
+  // voila: TVoilaTracker | null
 ) {
-  if (voila) {
-    voila.widgetAdded.connect(async (_, widget) => {
-      const session = widget.content.session;
-      session.rendermime.addFactory(
-        {
-          safe: true,
-          defaultRank: 50,
-          mimeTypes: [MIME_TYPE],
-          createRenderer: () =>
-            new IbisVegaRenderer(
-              async () => (await session.connected).kernel,
-              false
-            )
-        },
-        0
-      );
-    });
-  }
+  // if (voila) {
+  //   voila.widgetAdded.connect(async (_, widget) => {
+  //     const session = widget.content.session;
+  //     session.rendermime.addFactory(
+  //       {
+  //         safe: true,
+  //         defaultRank: 50,
+  //         mimeTypes: [MIME_TYPE],
+  //         createRenderer: () =>
+  //           new IbisVegaRenderer(
+  //             async () => (await session.connected).kernel,
+  //             false
+  //           )
+  //       },
+  //       0
+  //     );
+  //   });
+  // }
 
   if (notebooks) {
-    notebooks.widgetAdded.connect((_, { context, content }) => {
-      content.rendermime.addFactory(
+    notebooks.widgetAdded.connect((_, widget) => {
+      widget.content.rendermime.addFactory(
         {
           safe: true,
           defaultRank: 50,
           mimeTypes: [MIME_TYPE],
-          createRenderer: () =>
-            new IbisVegaRenderer(async () => context.session.kernel, true)
+          createRenderer: options =>
+            new IbisVegaRenderer(
+              options,
+              async () => widget.context.sessionContext.session?.kernel,
+              true
+            )
         },
         0
       );
