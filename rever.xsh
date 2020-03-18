@@ -27,7 +27,6 @@ $ACTIVITIES = [
     'update_dev_version',
     'commit_dev_version',
     'push',
-    'clean_repo',
 ]
 
 
@@ -323,6 +322,9 @@ def upload_npm_distributions():
     Upload the distributions to npm.
     """
     activate($TEMP_ENV)
+
+    # Ask for credentials
+    npm login
 
     # The file might be already there
     try:
