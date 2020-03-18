@@ -47,7 +47,7 @@ You can also create dashboards with this with Phoila.
 ```sh
 pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
 phoila install ibis-vega-transform
-phoila "examples/Charting Example.ipynb"
+phoila "examples/charting-example.ipynb"
 ```
 
 ### Tracing
@@ -67,9 +67,7 @@ so before you run your visualization, click the "Jaeger" icon in the JupyterLab 
 
 You also will likely have to increase the max UDP packet size on your OS to [accomdate for the large logs](https://github.com/jaegertracing/jaeger-client-node/issues/124#issuecomment-324222456):
 
-# Mac
-
-##
+### Mac
 
 ```sh
 # Edit now
@@ -92,7 +90,6 @@ conda activate ibis-vega-transform
 pip install -e ".[dev]"
 jlpm
 jupyter labextension install . --no-build
-
 
 jupyter lab --watch
 jlpm run watch
@@ -122,63 +119,3 @@ phoila "examples/Charting Example.ipynb"
 
 We are using [`jupyter-jaeger`](https://github.com/Quansight/jupyter-jaeger) to trace each interaction
 for benchmarking.
-
-## Releasing
-
-First create a test environment:
-
-```bash
-conda env remove -n tmp --yes
-conda env create -f binder/environment.yml --name tmp
-conda activate tmp
-conda install -c conda-forge wheel twine black
-```
-
-Then bump the Python version in `setup.py` and upload a test version:
-
-```bash
-rm -rf dist/
-python setup.py sdist bdist_wheel
-twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-```
-
-Install the test version in your new environment:
-
-```bash
-pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple ibis-vega-transform
-```
-
-Now bump the version for the Javascript package in `package.json`. The run a build,
-create a tarball, and install it as a JupyterLab extension:
-
-```bash
-yarn run build
-yarn pack --filename out.tgz
-jupyter labextension install out.tgz
-```
-
-Now open JupyterLab and run through all the notebooks in `examples` to make sure
-they still render correctly.
-
-Now you can publish the Python package:
-
-```bash
-twine upload dist/*
-```
-
-And publish the node package:
-
-```bash
-npm publish out.tgz
-```
-
-And add a git tag for the release and push:
-
-```bash
-rm out.tgz
-git add package.json setup.py
-git commit -m 'Version <new version>'
-git tag <new version>
-git push
-git push --tags
-```

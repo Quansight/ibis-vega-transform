@@ -1,0 +1,35 @@
+- name: Grant Nestor
+  email: grantnestor@gmail.com
+  num_commits: 6
+  first_commit: 2019-03-12 10:53:12
+  github: gnestor
+- name: Dominik Moritz
+  email: domoritz@gmail.com
+  num_commits: 4
+  first_commit: 2019-07-27 15:00:29
+  github: domoritz
+- name: Ian Rose
+  email: ian.r.rose@gmail.com
+  num_commits: 252
+  first_commit: 2018-03-30 11:43:36
+  github: ian-r-rose
+- name: Gonzalo Peña-Castellanos
+  email: goanpeca@gmail.com
+  aliases:
+  - Gonzalo Pena-Castellanos
+  - goanpeca
+  num_commits: 17
+  first_commit: 2019-12-09 12:18:38
+  github: goanpeca
+- name: Tony Fast
+  email: tony.fast@gmail.com
+  aliases:
+  - tonyfast
+  github: tonyfast
+  num_commits: 2
+  first_commit: 2018-04-23 14:32:08
+- name: Saul Shanabrook
+  email: s.shanabrook@gmail.com
+  github: saulshanabrook
+  num_commits: 247
+  first_commit: 2018-04-24 13:51:11

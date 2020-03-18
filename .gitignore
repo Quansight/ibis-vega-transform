@@ -23,3 +23,8 @@ package-lock.json
 yarn.lock
 *.orig
 report.*.json
+
+# Rever
+rever/
+activate.xsh
+out.tgz
