@@ -1,6 +1,7 @@
 """Setup script for Ibis Vega Transform."""
 
 # Standard library imports
+import ast
 import os
 
 # Third party imports
@@ -16,7 +17,7 @@ def get_version(module="ibis_vega_transform"):
     lines = data.split("\n")
     for line in lines:
         if line.startswith("__version__"):
-            version = line.split("=")[-1].strip()
+            version = ast.literal_eval(line.split("=")[-1].strip())
             return version
 
 
@@ -63,9 +64,9 @@ setuptools.setup(
     include_package_data=True,
     classifiers=[
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3'
-        'Programming Language :: Python :: 3.6'
-        'Programming Language :: Python :: 3.7'
-        'Programming Language :: Python :: 3.8'
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 )
