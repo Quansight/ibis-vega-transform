@@ -35,6 +35,6 @@ export async function compileSpec(
     const finalSpec = await transformedSpecPromise.promise;
     return finalSpec;
   } else {
-    return Promise
+    return Promise;
   }
 }

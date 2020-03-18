@@ -28,7 +28,7 @@ const plugin: JupyterFrontEndPlugin<void> = {
  */
 function activate(
   _: JupyterFrontEnd,
-  notebooks: INotebookTracker | null,
+  notebooks: INotebookTracker | null
   // voila: TVoilaTracker | null
 ) {
   // if (voila) {

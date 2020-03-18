@@ -94,6 +94,7 @@ def get_version(version_type, module=$MODULE):
 # Actual versions to use
 $NEW_VERSION = get_version($VERSION)
 $DEV_VERSION = $NEW_VERSION + '.dev0'
+$DEV_NPM_VERSION = $NEW_VERSION + '-dev.0'
 
 
 def activate(env_name):
@@ -110,12 +111,19 @@ def activate(env_name):
     $[conda info]
 
 
-def update_version(version):
+def update_version(python_version, npm_version=None):
     """
     Update version patterns.
     """
+    if npm_version is None:
+        npm_version = python_version
+
     for fpath, pattern, new_pattern in $VERSION_BUMP_PATTERNS:
-        new_pattern = new_pattern.replace('$VERSION', version)
+        if 'package.json' in fpath:
+            new_pattern = new_pattern.replace('$VERSION', npm_version)
+        elif '__init__.py' in fpath:
+            new_pattern = new_pattern.replace('$VERSION', python_version)
+
         replace_in_file(pattern, new_pattern, fpath)
 
 
@@ -338,7 +346,7 @@ def update_dev_version():
     """
     Update `__init__.py` (add 'dev0' and increment minor).
     """
-    update_version($DEV_VERSION)
+    update_version(python_version=$DEV_VERSION, npm_version=$DEV_NPM_VERSION)
 
 
 @activity

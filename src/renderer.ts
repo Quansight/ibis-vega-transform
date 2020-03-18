@@ -22,7 +22,9 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
   _mimeType: string;
   constructor(
     options: IRenderMime.IRendererOptions,
-    private getKernel: () => Promise<Kernel.IKernelConnection | undefined | null>,
+    private getKernel: () => Promise<
+      Kernel.IKernelConnection | undefined | null
+    >,
     private tracing: boolean
   ) {
     super();
