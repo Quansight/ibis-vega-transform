@@ -112,7 +112,7 @@ You can create dashboards from notebooks by using Phoila:
 # Need his PR https://github.com/vidartf/phoila/pull/11
 pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
 phoila install .
-phoila "examples/Charting Example.ipynb"
+phoila "examples/charting-example.ipynb"
 ```
 
 ### Tracing
