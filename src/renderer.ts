@@ -17,16 +17,13 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
   /**
    * Construct a new renderer.
    */
-  _mimeType: string;
   constructor(
-    options: IRenderMime.IRendererOptions,
     private getKernel: () => Promise<
       Kernel.IKernelConnection | undefined | null
     >,
     private tracing: boolean
   ) {
     super();
-    this._mimeType = options.mimeType;
   }
 
   /**

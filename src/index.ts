@@ -32,9 +32,8 @@ function activate(_: JupyterFrontEnd, notebooks: INotebookTracker) {
         safe: true,
         defaultRank: 50,
         mimeTypes: [MIME_TYPE],
-        createRenderer: options =>
+        createRenderer: () =>
           new IbisVegaRenderer(
-            options,
             async () => widget.context.sessionContext.session?.kernel,
             true
           )
