@@ -52,7 +52,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
 
     const kernel = await this.getKernel();
 
-    if (kernel === null) {
+    if (!kernel) {
       return;
     }
 

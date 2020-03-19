@@ -10,7 +10,7 @@ const COMM_ID = 'ibis-vega-transform:compiler';
  * with the Vega transforms swapped out for Ibis transforms.
  */
 export async function compileSpec(
-  kernel: Kernel.IKernelConnection | undefined,
+  kernel: Kernel.IKernelConnection,
   vlSpec: TopLevelSpec,
   span: any,
   rootSpan: any
@@ -28,7 +28,7 @@ export async function compileSpec(
 
   // Change vega transforms to ibis transforms on the server side.
   const transformedSpecPromise = new PromiseDelegate<any>();
-  const comm = kernel?.createComm(COMM_ID);
+  const comm = kernel.createComm(COMM_ID);
   if (comm !== undefined) {
     comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
     await comm.open({ spec: vSpec, span, rootSpan } as any).done;
