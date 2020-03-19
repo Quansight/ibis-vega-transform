@@ -38,18 +38,6 @@ alt.Chart(table).mark_bar().encode(
 Check out the notebooks in the [`./examples/`](./examples/) directory to see
 some options using interactive charts and the OmniSci backend.
 
-### Dashboards
-
-You can also create dashboards with this with Phoila.
-
-![](./docs/dashboard.png)
-
-```sh
-pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
-phoila install ibis-vega-transform
-phoila "examples/charting-example.ipynb"
-```
-
 ### Tracing
 
 If you want to see traces of the interactiosn for debugging and performance analysis,
@@ -102,17 +90,6 @@ Run the formatting tools at any time using:
 ```sh
 black ibis_vega_transform
 jlpm run prettier
-```
-
-### Dashboards
-
-You can create dashboards from notebooks by using Phoila:
-
-```sh
-# Need his PR https://github.com/vidartf/phoila/pull/11
-pip install git+https://github.com/Quansight/phoila.git@comm_open "notebook<6.0"
-phoila install .
-phoila "examples/charting-example.ipynb"
 ```
 
 ### Tracing

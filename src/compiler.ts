@@ -1,5 +1,5 @@
 import { Kernel } from '@jupyterlab/services';
-import { PromiseDelegate } from '@phosphor/coreutils';
+import { PromiseDelegate } from '@lumino/coreutils';
 import { compile, extractTransforms, normalize, TopLevelSpec } from 'vega-lite';
 import { initConfig } from 'vega-lite/build/src/config';
 
@@ -28,7 +28,7 @@ export async function compileSpec(
 
   // Change vega transforms to ibis transforms on the server side.
   const transformedSpecPromise = new PromiseDelegate<any>();
-  const comm = kernel.connectToComm(COMM_ID);
+  const comm = kernel.createComm(COMM_ID);
   comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
   await comm.open({ spec: vSpec, span, rootSpan } as any).done;
   const finalSpec = await transformedSpecPromise.promise;

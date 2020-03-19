@@ -1,5 +1,5 @@
-import { IRenderMime } from '@jupyterlab/rendermime';
-import { Widget } from '@phosphor/widgets';
+import { IRenderMime } from '@jupyterlab/rendermime-interfaces';
+import { Widget } from '@lumino/widgets';
 import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
@@ -18,7 +18,9 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
    * Construct a new renderer.
    */
   constructor(
-    private getKernel: () => Promise<Kernel.IKernelConnection | null>,
+    private getKernel: () => Promise<
+      Kernel.IKernelConnection | undefined | null
+    >,
     private tracing: boolean
   ) {
     super();
@@ -44,7 +46,7 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
 
     const kernel = await this.getKernel();
 
-    if (kernel === null) {
+    if (!kernel) {
       return;
     }
 
