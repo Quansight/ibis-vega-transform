@@ -9,8 +9,6 @@ import { Kernel } from '@jupyterlab/services';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';
 
-const CLASS_NAME = 'mimerenderer-ibis-vega';
-
 /**
  * An alternative vega renderer that can query the server for lazy
  * evaluations of ibis expressions targeting SQL-like backends.
@@ -29,7 +27,6 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
   ) {
     super();
     this._mimeType = options.mimeType;
-    this.addClass(CLASS_NAME);
   }
 
   /**
