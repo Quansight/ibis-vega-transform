@@ -1,4 +1,3 @@
-
 The ibis-vega-transform project has some great contributors! They are:
 
 - [Dominik Moritz](https://github.com/domoritz)
@@ -7,6 +6,5 @@ The ibis-vega-transform project has some great contributors! They are:
 - [Ian Rose](https://github.com/ian-r-rose)
 - [Saul Shanabrook](https://github.com/saulshanabrook)
 - [Tony Fast](https://github.com/tonyfast)
-
 
 These have been sorted alphabetically.
