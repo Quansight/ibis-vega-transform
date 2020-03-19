@@ -18,7 +18,7 @@
   aliases:
   - Gonzalo Pena-Castellanos
   - goanpeca
-  num_commits: 17
+  num_commits: 26
   first_commit: 2019-12-09 12:18:38
   github: goanpeca
 - name: Tony Fast
@@ -31,5 +31,5 @@
 - name: Saul Shanabrook
   email: s.shanabrook@gmail.com
   github: saulshanabrook
-  num_commits: 247
+  num_commits: 254
   first_commit: 2018-04-24 13:51:11
