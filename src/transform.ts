@@ -91,7 +91,7 @@ async function getData(
   const comm = kernel.createComm('queryibis');
 
   const resultPromise = new PromiseDelegate<JSONObject[]>();
-  comm.onMsg = (msg: { content: { data: any } }) =>
+  comm.onMsg = msg =>
     resultPromise.resolve((msg.content.data as any) as JSONObject[]);
 
   // set span inside comm to be this comm message instead of root span
