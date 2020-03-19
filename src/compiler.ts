@@ -29,12 +29,8 @@ export async function compileSpec(
   // Change vega transforms to ibis transforms on the server side.
   const transformedSpecPromise = new PromiseDelegate<any>();
   const comm = kernel.createComm(COMM_ID);
-  if (comm !== undefined) {
-    comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
-    await comm.open({ spec: vSpec, span, rootSpan } as any).done;
-    const finalSpec = await transformedSpecPromise.promise;
-    return finalSpec;
-  } else {
-    return Promise;
-  }
+  comm.onMsg = msg => transformedSpecPromise.resolve(msg.content.data);
+  await comm.open({ spec: vSpec, span, rootSpan } as any).done;
+  const finalSpec = await transformedSpecPromise.promise;
+  return finalSpec;
 }
