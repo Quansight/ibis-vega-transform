@@ -12,7 +12,7 @@ const compare = require('resemblejs').compare;
 const { setDefaultOptions } = require('expect-puppeteer');
 
 // Extend the time allowed for tests to complete:
-const timeout = 5 * 60 * 1000;
+const timeout = 10 * 60 * 1000;
 jest.setTimeout(timeout);
 setDefaultOptions({ timeout });
 
@@ -90,7 +90,7 @@ async function clickMenuItem(menuString: string, subMenuString: string) {
   const popupReply = menuItems[menuString][subMenuString]['popup'];
 
   const menuElement = await getElement(
-    'li[class="p-MenuBar-item"]',
+    'li[class="lm-MenuBar-item p-MenuBar-item"]',
     menuString
   );
   menuElement.click();
@@ -219,7 +219,7 @@ describe('Test Ibis-Vega-Transform', () => {
     // File name, chart amount, timeout (ms)
     ['charting-example', 1, 60 * 1000],
     ['ibis-altair-extraction', 4, 30 * 1000],
-    // ['interactive-slider.ipynb', 0, 10 * 1000],  // FAIL: enable after fix
+    ['interactive-slider', 1, 10 * 1000],
     ['omnisci-vega-example', 1, 15 * 1000],
     ['performance-charts', 2, 15 * 1000],
     ['vega-compiler', 4, 60 * 1000]
@@ -231,7 +231,7 @@ describe('Test Ibis-Vega-Transform', () => {
       // Go to specific notebook file
       await page.goto(`http://localhost:8080/lab/tree/examples/${file}.ipynb`);
       await page.waitForSelector(
-        '.p-DockPanel-tabBar li[data-type="document-title"]'
+        '.lm-DockPanel-tabBar li[data-type="document-title"]'
       );
       await sleep(5 * 1000);
 
@@ -260,6 +260,9 @@ describe('Test Ibis-Vega-Transform', () => {
       );
       console.log(`Setting download folder: ${folderPath}`);
 
+      // Wait to make sure all images appeared
+      await sleep(maxTimeout / 2);
+
       // Save images
       await saveCharts(folderPath);
       await page.waitFor(2 * 1000);
@@ -283,6 +286,12 @@ describe('Test Ibis-Vega-Transform', () => {
       const isBelowThreshold = value => value < threshold;
       expect(results.every(isBelowThreshold)).toBe(true);
       await page.waitFor(2 * 1000);
+
+      // Close dialog "Are you sure you want to leave..."
+      page.on('dialog', async dialog => {
+        console.log(dialog.message()); // outputs: ''
+        await dialog.dismiss();
+      });
 
       // Close and shutdown
       await clickMenuItem('File', 'Close and  Shutdown Notebook');
