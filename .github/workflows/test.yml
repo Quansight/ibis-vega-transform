@@ -12,6 +12,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CI: "true"
     steps:
       - name: Checkout branch
         uses: actions/checkout@v1

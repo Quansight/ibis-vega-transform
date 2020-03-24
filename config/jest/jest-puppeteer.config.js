@@ -6,10 +6,20 @@
  */
 
 const portNumber = 8080;
+let browserExecutablePath = '';
+
+// Use Chrome if running test suit locally
+if (process.env.CI !== 'true') {
+  browserExecutablePath =
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+}
+
 const config = {
   launch: {
     headless: false,
-    slowMo: process.env.SLOWMO === 'true'
+    slowMo: process.env.SLOWMO === 'true',
+    executablePath: browserExecutablePath,
+    browserContext: 'incognito'
   },
   // https://github.com/smooth-code/jest-puppeteer/tree/master/packages/jest-dev-server#options
   server: {

@@ -36,7 +36,7 @@ $GITHUB_ORG = 'Quansight'
 $GITHUB_REPO = $PROJECT
 $VERSION_BUMP_PATTERNS = [
     # These note where/how to find the version numbers
-    ($MODULE + '/__init__.py', r'__version__\s*=.*', "__version__ = '$VERSION'"),
+    ($MODULE + '/__init__.py', r'__version__\s*=.*', '__version__ = "$VERSION"'),
     ('package.json', r'"version":\s.*', '"version": "$VERSION",'),
 ]
 $AUTHORS_FILENAME = "AUTHORS.md"
@@ -276,7 +276,7 @@ def run_tests():
     # pytest $MODULE
 
     # Npm tests
-    # npm test
+    npm test
 
     while True:
         result = input(
