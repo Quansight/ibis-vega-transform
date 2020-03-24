@@ -41,7 +41,7 @@ some options using interactive charts and the OmniSci backend.
 ### Tracing
 
 If you want to see traces of the interactiosn for debugging and performance analysis,
-install the `jaeger-all-in-one` binary and the `jupyterlab-server-proxy-saulshanabrook`
+install the `jaeger-all-in-one` binary and the `jupyterlab-server-proxy`
 lab extension to see the Jaeger icon in the launcher.
 
 ```bash
