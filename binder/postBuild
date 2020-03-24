@@ -5,6 +5,5 @@ set -o xtrace
 pip install -e .
 jlpm install
 jlpm run build
-jupyter labextension install jupyterlab-server-proxy --no-build
 jupyter labextension install . --no-build
 jupyter lab build
