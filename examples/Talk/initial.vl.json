@@ -1,0 +1,83 @@
+{
+  "config": { "view": { "continuousWidth": 400, "continuousHeight": 300 } },
+  "vconcat": [
+    {
+      "data": { "name": "ibis:8440211111386506493" },
+      "mark": "line",
+      "encoding": {
+        "x": {
+          "type": "temporal",
+          "field": "created_at",
+          "timeUnit": "yearmonth"
+        },
+        "y": {
+          "type": "quantitative",
+          "aggregate": "count",
+          "scale": { "zero": false }
+        }
+      },
+      "height": 600,
+      "selection": {
+        "selector003": {
+          "type": "single",
+          "fields": ["repo_name"],
+          "bind": {
+            "input": "select",
+            "options": [
+              "jupyterlab/jupyterlab",
+              "vega/vega",
+              "vega/vega-lite",
+              "altair-viz/altair",
+              "cloudera/ibis",
+              "mapd/mapd-core"
+            ]
+          }
+        },
+        "selector004": {
+          "type": "interval",
+          "fields": ["created_at"],
+          "encodings": ["x"]
+        }
+      },
+      "transform": [{ "filter": { "selection": "selector003" } }],
+      "width": 600
+    },
+    {
+      "data": { "name": "ibis:8440211111386506493" },
+      "mark": "bar",
+      "encoding": {
+        "x": { "type": "quantitative", "aggregate": "count" },
+        "y": {
+          "type": "ordinal",
+          "field": "type",
+          "sort": { "encoding": "x", "order": "descending" }
+        }
+      },
+      "height": 600,
+      "selection": {
+        "selector003": {
+          "type": "single",
+          "fields": ["repo_name"],
+          "bind": {
+            "input": "select",
+            "options": [
+              "jupyterlab/jupyterlab",
+              "vega/vega",
+              "vega/vega-lite",
+              "altair-viz/altair",
+              "cloudera/ibis",
+              "mapd/mapd-core"
+            ]
+          }
+        }
+      },
+      "transform": [
+        { "filter": { "selection": "selector003" } },
+        { "filter": { "selection": "selector004" } }
+      ],
+      "width": 600
+    }
+  ],
+  "padding": { "left": 150, "right": 0, "top": 10, "bottom": 50 },
+  "$schema": "https://vega.github.io/schema/vega-lite/v4.0.0.json"
+}

@@ -1,0 +1,618 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "background": "white",
+  "padding": {"left": 150, "right": 0, "top": 10, "bottom": 50},
+  "width": 600,
+  "data": [
+    {"name": "selector003_store"},
+    {"name": "selector004_store"},
+    {
+      "name": "data_1",
+      "transform": [
+        {
+          "type": "queryibis",
+          "name": "8440211111386506493",
+          "span": {"uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1"},
+          "data": "{selector004_store: data('selector004_store'), selector003_store: data('selector003_store')}",
+          "transform": [
+            {
+              "type": "formula",
+              "expr": "toDate(datum[\"created_at\"])",
+              "as": "created_at"
+            },
+            {
+              "type": "filter",
+              "expr": "!(length(data(\"selector003_store\"))) || (vlSelectionTest(\"selector003_store\", datum))"
+            },
+            {
+              "type": "filter",
+              "expr": "!(length(data(\"selector004_store\"))) || (vlSelectionTest(\"selector004_store\", datum))"
+            },
+            {
+              "type": "aggregate",
+              "groupby": ["type"],
+              "ops": ["count"],
+              "fields": [null],
+              "as": ["__count"]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "data_2",
+      "transform": [
+        {
+          "type": "queryibis",
+          "name": "8440211111386506493",
+          "span": {"uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1"},
+          "data": "{selector004_store: data('selector004_store'), selector003_store: data('selector003_store')}",
+          "transform": [
+            {
+              "type": "formula",
+              "expr": "toDate(datum[\"created_at\"])",
+              "as": "created_at"
+            },
+            {
+              "type": "filter",
+              "expr": "!(length(data(\"selector003_store\"))) || (vlSelectionTest(\"selector003_store\", datum))"
+            },
+            {
+              "type": "filter",
+              "expr": "!(length(data(\"selector004_store\"))) || (vlSelectionTest(\"selector004_store\", datum))"
+            },
+            {
+              "type": "aggregate",
+              "groupby": ["type"],
+              "ops": ["count"],
+              "fields": [null],
+              "as": ["__count"]
+            },
+            {
+              "type": "filter",
+              "expr": "isValid(datum[\"__count\"]) && isFinite(+datum[\"__count\"])"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "data_3",
+      "transform": [
+        {
+          "type": "queryibis",
+          "name": "8440211111386506493",
+          "span": {"uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1"},
+          "data": "{selector003_store: data('selector003_store')}",
+          "transform": [
+            {
+              "type": "formula",
+              "expr": "toDate(datum[\"created_at\"])",
+              "as": "created_at"
+            },
+            {
+              "type": "filter",
+              "expr": "!(length(data(\"selector003_store\"))) || (vlSelectionTest(\"selector003_store\", datum))"
+            },
+            {
+              "field": "created_at",
+              "type": "timeunit",
+              "units": ["year", "month"],
+              "as": ["yearmonth_created_at", "yearmonth_created_at_end"]
+            },
+            {
+              "type": "aggregate",
+              "groupby": ["yearmonth_created_at"],
+              "ops": ["count"],
+              "fields": [null],
+              "as": ["__count"]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "signals": [
+    {"name": "childHeight", "value": 600},
+    {
+      "name": "unit",
+      "value": {},
+      "on": [
+        {"events": "mousemove", "update": "isTuple(group()) ? group() : unit"}
+      ]
+    },
+    {
+      "name": "selector003_repo_name",
+      "value": null,
+      "bind": {
+        "input": "select",
+        "options": [
+          "jupyterlab/jupyterlab",
+          "vega/vega",
+          "vega/vega-lite",
+          "altair-viz/altair",
+          "cloudera/ibis",
+          "mapd/mapd-core"
+        ]
+      }
+    },
+    {
+      "name": "selector003",
+      "update": "vlSelectionResolve(\"selector003_store\", \"union\")"
+    },
+    {
+      "name": "selector004",
+      "update": "vlSelectionResolve(\"selector004_store\", \"union\")"
+    }
+  ],
+  "layout": {"padding": 20, "columns": 1, "bounds": "full", "align": "each"},
+  "marks": [
+    {
+      "type": "group",
+      "name": "concat_0_group",
+      "style": "cell",
+      "encode": {
+        "update": {
+          "width": {"signal": "width"},
+          "height": {"signal": "childHeight"}
+        }
+      },
+      "signals": [
+        {
+          "name": "selector003_tuple",
+          "update": "selector003_repo_name !== null ? {fields: selector003_tuple_fields, values: [selector003_repo_name]} : null"
+        },
+        {
+          "name": "selector003_tuple_fields",
+          "value": [{"type": "E", "field": "repo_name"}]
+        },
+        {
+          "name": "selector003_modify",
+          "on": [
+            {
+              "events": {"signal": "selector003_tuple"},
+              "update": "modify(\"selector003_store\", selector003_tuple, true)"
+            }
+          ]
+        },
+        {
+          "name": "selector004_x",
+          "value": [],
+          "on": [
+            {
+              "events": {
+                "source": "scope",
+                "type": "mousedown",
+                "filter": [
+                  "!event.item || event.item.mark.name !== \"selector004_brush\""
+                ]
+              },
+              "update": "[x(unit), x(unit)]"
+            },
+            {
+              "events": {
+                "source": "window",
+                "type": "mousemove",
+                "consume": true,
+                "between": [
+                  {
+                    "source": "scope",
+                    "type": "mousedown",
+                    "filter": [
+                      "!event.item || event.item.mark.name !== \"selector004_brush\""
+                    ]
+                  },
+                  {"source": "window", "type": "mouseup"}
+                ]
+              },
+              "update": "[selector004_x[0], clamp(x(unit), 0, width)]"
+            },
+            {
+              "events": {"signal": "selector004_scale_trigger"},
+              "update": "[scale(\"concat_0_x\", selector004_yearmonth_created_at[0]), scale(\"concat_0_x\", selector004_yearmonth_created_at[1])]"
+            },
+            {
+              "events": {"signal": "selector004_translate_delta"},
+              "update": "clampRange(panLinear(selector004_translate_anchor.extent_x, selector004_translate_delta.x / span(selector004_translate_anchor.extent_x)), 0, width)"
+            },
+            {
+              "events": {"signal": "selector004_zoom_delta"},
+              "update": "clampRange(zoomLinear(selector004_x, selector004_zoom_anchor.x, selector004_zoom_delta), 0, width)"
+            },
+            {
+              "events": [{"source": "scope", "type": "dblclick"}],
+              "update": "[0, 0]"
+            }
+          ]
+        },
+        {
+          "name": "selector004_yearmonth_created_at",
+          "on": [
+            {
+              "events": {"signal": "selector004_x"},
+              "update": "selector004_x[0] === selector004_x[1] ? null : invert(\"concat_0_x\", selector004_x)"
+            }
+          ]
+        },
+        {
+          "name": "selector004_scale_trigger",
+          "value": {},
+          "on": [
+            {
+              "events": [{"scale": "concat_0_x"}],
+              "update": "(!isArray(selector004_yearmonth_created_at) || (+invert(\"concat_0_x\", selector004_x)[0] === +selector004_yearmonth_created_at[0] && +invert(\"concat_0_x\", selector004_x)[1] === +selector004_yearmonth_created_at[1])) ? selector004_scale_trigger : {}"
+            }
+          ]
+        },
+        {
+          "name": "selector004_tuple",
+          "on": [
+            {
+              "events": [{"signal": "selector004_yearmonth_created_at"}],
+              "update": "selector004_yearmonth_created_at ? {unit: \"concat_0\", fields: selector004_tuple_fields, values: [selector004_yearmonth_created_at]} : null"
+            }
+          ]
+        },
+        {
+          "name": "selector004_tuple_fields",
+          "value": [
+            {"type": "E", "field": "created_at"},
+            {"field": "yearmonth_created_at", "channel": "x", "type": "R"}
+          ]
+        },
+        {
+          "name": "selector004_translate_anchor",
+          "value": {},
+          "on": [
+            {
+              "events": [
+                {
+                  "source": "scope",
+                  "type": "mousedown",
+                  "markname": "selector004_brush"
+                }
+              ],
+              "update": "{x: x(unit), y: y(unit), extent_x: slice(selector004_x)}"
+            }
+          ]
+        },
+        {
+          "name": "selector004_translate_delta",
+          "value": {},
+          "on": [
+            {
+              "events": [
+                {
+                  "source": "window",
+                  "type": "mousemove",
+                  "consume": true,
+                  "between": [
+                    {
+                      "source": "scope",
+                      "type": "mousedown",
+                      "markname": "selector004_brush"
+                    },
+                    {"source": "window", "type": "mouseup"}
+                  ]
+                }
+              ],
+              "update": "{x: selector004_translate_anchor.x - x(unit), y: selector004_translate_anchor.y - y(unit)}"
+            }
+          ]
+        },
+        {
+          "name": "selector004_zoom_anchor",
+          "on": [
+            {
+              "events": [
+                {
+                  "source": "scope",
+                  "type": "wheel",
+                  "consume": true,
+                  "markname": "selector004_brush"
+                }
+              ],
+              "update": "{x: x(unit), y: y(unit)}"
+            }
+          ]
+        },
+        {
+          "name": "selector004_zoom_delta",
+          "on": [
+            {
+              "events": [
+                {
+                  "source": "scope",
+                  "type": "wheel",
+                  "consume": true,
+                  "markname": "selector004_brush"
+                }
+              ],
+              "force": true,
+              "update": "pow(1.001, event.deltaY * pow(16, event.deltaMode))"
+            }
+          ]
+        },
+        {
+          "name": "selector004_modify",
+          "on": [
+            {
+              "events": {"signal": "selector004_tuple"},
+              "update": "modify(\"selector004_store\", selector004_tuple, true)"
+            }
+          ]
+        }
+      ],
+      "marks": [
+        {
+          "name": "selector004_brush_bg",
+          "type": "rect",
+          "clip": true,
+          "encode": {
+            "enter": {
+              "fill": {"value": "#333"},
+              "fillOpacity": {"value": 0.125}
+            },
+            "update": {
+              "x": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "signal": "selector004_x[0]"
+                },
+                {"value": 0}
+              ],
+              "y": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "value": 0
+                },
+                {"value": 0}
+              ],
+              "x2": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "signal": "selector004_x[1]"
+                },
+                {"value": 0}
+              ],
+              "y2": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "field": {"group": "height"}
+                },
+                {"value": 0}
+              ]
+            }
+          }
+        },
+        {
+          "name": "concat_0_marks",
+          "type": "line",
+          "style": ["line"],
+          "sort": {"field": "datum[\"yearmonth_created_at\"]"},
+          "interactive": true,
+          "from": {"data": "data_3"},
+          "encode": {
+            "update": {
+              "stroke": {"value": "#4c78a8"},
+              "x": {"scale": "concat_0_x", "field": "yearmonth_created_at"},
+              "y": {"scale": "concat_0_y", "field": "__count"},
+              "defined": {
+                "signal": "isValid(datum[\"yearmonth_created_at\"]) && isFinite(+datum[\"yearmonth_created_at\"]) && isValid(datum[\"__count\"]) && isFinite(+datum[\"__count\"])"
+              }
+            }
+          }
+        },
+        {
+          "name": "selector004_brush",
+          "type": "rect",
+          "clip": true,
+          "encode": {
+            "enter": {"fill": {"value": "transparent"}},
+            "update": {
+              "x": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "signal": "selector004_x[0]"
+                },
+                {"value": 0}
+              ],
+              "y": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "value": 0
+                },
+                {"value": 0}
+              ],
+              "x2": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "signal": "selector004_x[1]"
+                },
+                {"value": 0}
+              ],
+              "y2": [
+                {
+                  "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
+                  "field": {"group": "height"}
+                },
+                {"value": 0}
+              ],
+              "stroke": [
+                {
+                  "test": "selector004_x[0] !== selector004_x[1]",
+                  "value": "white"
+                },
+                {"value": null}
+              ]
+            }
+          }
+        }
+      ],
+      "axes": [
+        {
+          "scale": "concat_0_x",
+          "orient": "bottom",
+          "gridScale": "concat_0_y",
+          "grid": true,
+          "tickCount": {"signal": "ceil(width/40)"},
+          "domain": false,
+          "labels": false,
+          "maxExtent": 0,
+          "minExtent": 0,
+          "ticks": false,
+          "zindex": 0
+        },
+        {
+          "scale": "concat_0_y",
+          "orient": "left",
+          "gridScale": "concat_0_x",
+          "grid": true,
+          "tickCount": {"signal": "ceil(childHeight/40)"},
+          "domain": false,
+          "labels": false,
+          "maxExtent": 0,
+          "minExtent": 0,
+          "ticks": false,
+          "zindex": 0
+        },
+        {
+          "scale": "concat_0_x",
+          "orient": "bottom",
+          "grid": false,
+          "title": "created_at (year-month)",
+          "labelFlush": true,
+          "labelOverlap": true,
+          "tickCount": {"signal": "ceil(width/40)"},
+          "zindex": 0
+        },
+        {
+          "scale": "concat_0_y",
+          "orient": "left",
+          "grid": false,
+          "title": "Count of Records",
+          "labelOverlap": true,
+          "tickCount": {"signal": "ceil(childHeight/40)"},
+          "zindex": 0
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "name": "concat_1_group",
+      "style": "cell",
+      "encode": {
+        "update": {
+          "width": {"signal": "width"},
+          "height": {"signal": "childHeight"}
+        }
+      },
+      "signals": [
+        {
+          "name": "selector003_tuple",
+          "update": "selector003_repo_name !== null ? {fields: selector003_tuple_fields, values: [selector003_repo_name]} : null"
+        },
+        {
+          "name": "selector003_tuple_fields",
+          "value": [{"type": "E", "field": "repo_name"}]
+        },
+        {
+          "name": "selector003_modify",
+          "on": [
+            {
+              "events": {"signal": "selector003_tuple"},
+              "update": "modify(\"selector003_store\", selector003_tuple, true)"
+            }
+          ]
+        }
+      ],
+      "marks": [
+        {
+          "name": "concat_1_marks",
+          "type": "rect",
+          "style": ["bar"],
+          "interactive": true,
+          "from": {"data": "data_2"},
+          "encode": {
+            "update": {
+              "fill": {"value": "#4c78a8"},
+              "x": {"scale": "concat_1_x", "field": "__count"},
+              "x2": {"scale": "concat_1_x", "value": 0},
+              "y": {"scale": "concat_1_y", "field": "type"},
+              "height": {"scale": "concat_1_y", "band": true}
+            }
+          }
+        }
+      ],
+      "axes": [
+        {
+          "scale": "concat_1_x",
+          "orient": "bottom",
+          "gridScale": "concat_1_y",
+          "grid": true,
+          "tickCount": {"signal": "ceil(width/40)"},
+          "domain": false,
+          "labels": false,
+          "maxExtent": 0,
+          "minExtent": 0,
+          "ticks": false,
+          "zindex": 0
+        },
+        {
+          "scale": "concat_1_x",
+          "orient": "bottom",
+          "grid": false,
+          "title": "Count of Records",
+          "labelFlush": true,
+          "labelOverlap": true,
+          "tickCount": {"signal": "ceil(width/40)"},
+          "zindex": 0
+        },
+        {
+          "scale": "concat_1_y",
+          "orient": "left",
+          "grid": false,
+          "title": "type",
+          "labelOverlap": true,
+          "zindex": 0
+        }
+      ]
+    }
+  ],
+  "scales": [
+    {
+      "name": "concat_0_x",
+      "type": "time",
+      "domain": {"data": "data_3", "field": "yearmonth_created_at"},
+      "range": [0, {"signal": "width"}]
+    },
+    {
+      "name": "concat_0_y",
+      "type": "linear",
+      "domain": {"data": "data_3", "field": "__count"},
+      "range": [{"signal": "childHeight"}, 0],
+      "zero": false,
+      "nice": true
+    },
+    {
+      "name": "concat_1_x",
+      "type": "linear",
+      "domain": {"data": "data_2", "field": "__count"},
+      "range": [0, {"signal": "width"}],
+      "nice": true,
+      "zero": true
+    },
+    {
+      "name": "concat_1_y",
+      "type": "band",
+      "domain": {
+        "data": "data_1",
+        "field": "type",
+        "sort": {"op": "min", "field": "__count", "order": "descending"}
+      },
+      "range": [0, {"signal": "childHeight"}],
+      "paddingInner": 0.1,
+      "paddingOuter": 0.05
+    }
+  ]
+}
