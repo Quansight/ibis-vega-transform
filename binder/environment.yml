@@ -9,3 +9,5 @@ dependencies:
   - nodejs=12
   - notebook
   - tornado
+  - graphviz
+  - altair
