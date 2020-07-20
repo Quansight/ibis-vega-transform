@@ -6,7 +6,7 @@ dependencies:
   - jupyterlab>=2
   - pymapd
   - python>=3.7
-  - nodejs=12
+  - nodejs>=12
   - notebook
   - tornado
   - graphviz
