@@ -1,18 +1,18 @@
 {
   "$schema": "https://vega.github.io/schema/vega/v5.json",
   "background": "white",
-  "padding": {"left": 150, "right": 0, "top": 10, "bottom": 50},
+  "padding": { "left": 150, "right": 0, "top": 10, "bottom": 50 },
   "width": 600,
   "data": [
-    {"name": "selector003_store"},
-    {"name": "selector004_store"},
+    { "name": "selector003_store" },
+    { "name": "selector004_store" },
     {
       "name": "data_1",
       "transform": [
         {
           "type": "queryibis",
           "name": "8440211111386506493",
-          "span": {"uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1"},
+          "span": { "uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1" },
           "data": "{selector004_store: data('selector004_store'), selector003_store: data('selector003_store')}",
           "transform": [
             {
@@ -45,7 +45,7 @@
         {
           "type": "queryibis",
           "name": "8440211111386506493",
-          "span": {"uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1"},
+          "span": { "uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1" },
           "data": "{selector004_store: data('selector004_store'), selector003_store: data('selector003_store')}",
           "transform": [
             {
@@ -82,7 +82,7 @@
         {
           "type": "queryibis",
           "name": "8440211111386506493",
-          "span": {"uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1"},
+          "span": { "uber-trace-id": "99afeaf72f338273:587333ddbe2b363:0:1" },
           "data": "{selector003_store: data('selector003_store')}",
           "transform": [
             {
@@ -113,12 +113,12 @@
     }
   ],
   "signals": [
-    {"name": "childHeight", "value": 600},
+    { "name": "childHeight", "value": 600 },
     {
       "name": "unit",
       "value": {},
       "on": [
-        {"events": "mousemove", "update": "isTuple(group()) ? group() : unit"}
+        { "events": "mousemove", "update": "isTuple(group()) ? group() : unit" }
       ]
     },
     {
@@ -145,7 +145,7 @@
       "update": "vlSelectionResolve(\"selector004_store\", \"union\")"
     }
   ],
-  "layout": {"padding": 20, "columns": 1, "bounds": "full", "align": "each"},
+  "layout": { "padding": 20, "columns": 1, "bounds": "full", "align": "each" },
   "marks": [
     {
       "type": "group",
@@ -153,8 +153,8 @@
       "style": "cell",
       "encode": {
         "update": {
-          "width": {"signal": "width"},
-          "height": {"signal": "childHeight"}
+          "width": { "signal": "width" },
+          "height": { "signal": "childHeight" }
         }
       },
       "signals": [
@@ -164,13 +164,13 @@
         },
         {
           "name": "selector003_tuple_fields",
-          "value": [{"type": "E", "field": "repo_name"}]
+          "value": [{ "type": "E", "field": "repo_name" }]
         },
         {
           "name": "selector003_modify",
           "on": [
             {
-              "events": {"signal": "selector003_tuple"},
+              "events": { "signal": "selector003_tuple" },
               "update": "modify(\"selector003_store\", selector003_tuple, true)"
             }
           ]
@@ -202,25 +202,25 @@
                       "!event.item || event.item.mark.name !== \"selector004_brush\""
                     ]
                   },
-                  {"source": "window", "type": "mouseup"}
+                  { "source": "window", "type": "mouseup" }
                 ]
               },
               "update": "[selector004_x[0], clamp(x(unit), 0, width)]"
             },
             {
-              "events": {"signal": "selector004_scale_trigger"},
+              "events": { "signal": "selector004_scale_trigger" },
               "update": "[scale(\"concat_0_x\", selector004_yearmonth_created_at[0]), scale(\"concat_0_x\", selector004_yearmonth_created_at[1])]"
             },
             {
-              "events": {"signal": "selector004_translate_delta"},
+              "events": { "signal": "selector004_translate_delta" },
               "update": "clampRange(panLinear(selector004_translate_anchor.extent_x, selector004_translate_delta.x / span(selector004_translate_anchor.extent_x)), 0, width)"
             },
             {
-              "events": {"signal": "selector004_zoom_delta"},
+              "events": { "signal": "selector004_zoom_delta" },
               "update": "clampRange(zoomLinear(selector004_x, selector004_zoom_anchor.x, selector004_zoom_delta), 0, width)"
             },
             {
-              "events": [{"source": "scope", "type": "dblclick"}],
+              "events": [{ "source": "scope", "type": "dblclick" }],
               "update": "[0, 0]"
             }
           ]
@@ -229,7 +229,7 @@
           "name": "selector004_yearmonth_created_at",
           "on": [
             {
-              "events": {"signal": "selector004_x"},
+              "events": { "signal": "selector004_x" },
               "update": "selector004_x[0] === selector004_x[1] ? null : invert(\"concat_0_x\", selector004_x)"
             }
           ]
@@ -239,7 +239,7 @@
           "value": {},
           "on": [
             {
-              "events": [{"scale": "concat_0_x"}],
+              "events": [{ "scale": "concat_0_x" }],
               "update": "(!isArray(selector004_yearmonth_created_at) || (+invert(\"concat_0_x\", selector004_x)[0] === +selector004_yearmonth_created_at[0] && +invert(\"concat_0_x\", selector004_x)[1] === +selector004_yearmonth_created_at[1])) ? selector004_scale_trigger : {}"
             }
           ]
@@ -248,7 +248,7 @@
           "name": "selector004_tuple",
           "on": [
             {
-              "events": [{"signal": "selector004_yearmonth_created_at"}],
+              "events": [{ "signal": "selector004_yearmonth_created_at" }],
               "update": "selector004_yearmonth_created_at ? {unit: \"concat_0\", fields: selector004_tuple_fields, values: [selector004_yearmonth_created_at]} : null"
             }
           ]
@@ -256,8 +256,8 @@
         {
           "name": "selector004_tuple_fields",
           "value": [
-            {"type": "E", "field": "created_at"},
-            {"field": "yearmonth_created_at", "channel": "x", "type": "R"}
+            { "type": "E", "field": "created_at" },
+            { "field": "yearmonth_created_at", "channel": "x", "type": "R" }
           ]
         },
         {
@@ -292,7 +292,7 @@
                       "type": "mousedown",
                       "markname": "selector004_brush"
                     },
-                    {"source": "window", "type": "mouseup"}
+                    { "source": "window", "type": "mouseup" }
                   ]
                 }
               ],
@@ -337,7 +337,7 @@
           "name": "selector004_modify",
           "on": [
             {
-              "events": {"signal": "selector004_tuple"},
+              "events": { "signal": "selector004_tuple" },
               "update": "modify(\"selector004_store\", selector004_tuple, true)"
             }
           ]
@@ -350,8 +350,8 @@
           "clip": true,
           "encode": {
             "enter": {
-              "fill": {"value": "#333"},
-              "fillOpacity": {"value": 0.125}
+              "fill": { "value": "#333" },
+              "fillOpacity": { "value": 0.125 }
             },
             "update": {
               "x": [
@@ -359,28 +359,28 @@
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
                   "signal": "selector004_x[0]"
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "y": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
                   "value": 0
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "x2": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
                   "signal": "selector004_x[1]"
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "y2": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
-                  "field": {"group": "height"}
+                  "field": { "group": "height" }
                 },
-                {"value": 0}
+                { "value": 0 }
               ]
             }
           }
@@ -389,14 +389,14 @@
           "name": "concat_0_marks",
           "type": "line",
           "style": ["line"],
-          "sort": {"field": "datum[\"yearmonth_created_at\"]"},
+          "sort": { "field": "datum[\"yearmonth_created_at\"]" },
           "interactive": true,
-          "from": {"data": "data_3"},
+          "from": { "data": "data_3" },
           "encode": {
             "update": {
-              "stroke": {"value": "#4c78a8"},
-              "x": {"scale": "concat_0_x", "field": "yearmonth_created_at"},
-              "y": {"scale": "concat_0_y", "field": "__count"},
+              "stroke": { "value": "#4c78a8" },
+              "x": { "scale": "concat_0_x", "field": "yearmonth_created_at" },
+              "y": { "scale": "concat_0_y", "field": "__count" },
               "defined": {
                 "signal": "isValid(datum[\"yearmonth_created_at\"]) && isFinite(+datum[\"yearmonth_created_at\"]) && isValid(datum[\"__count\"]) && isFinite(+datum[\"__count\"])"
               }
@@ -408,42 +408,42 @@
           "type": "rect",
           "clip": true,
           "encode": {
-            "enter": {"fill": {"value": "transparent"}},
+            "enter": { "fill": { "value": "transparent" } },
             "update": {
               "x": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
                   "signal": "selector004_x[0]"
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "y": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
                   "value": 0
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "x2": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
                   "signal": "selector004_x[1]"
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "y2": [
                 {
                   "test": "data(\"selector004_store\").length && data(\"selector004_store\")[0].unit === \"concat_0\"",
-                  "field": {"group": "height"}
+                  "field": { "group": "height" }
                 },
-                {"value": 0}
+                { "value": 0 }
               ],
               "stroke": [
                 {
                   "test": "selector004_x[0] !== selector004_x[1]",
                   "value": "white"
                 },
-                {"value": null}
+                { "value": null }
               ]
             }
           }
@@ -455,7 +455,7 @@
           "orient": "bottom",
           "gridScale": "concat_0_y",
           "grid": true,
-          "tickCount": {"signal": "ceil(width/40)"},
+          "tickCount": { "signal": "ceil(width/40)" },
           "domain": false,
           "labels": false,
           "maxExtent": 0,
@@ -468,7 +468,7 @@
           "orient": "left",
           "gridScale": "concat_0_x",
           "grid": true,
-          "tickCount": {"signal": "ceil(childHeight/40)"},
+          "tickCount": { "signal": "ceil(childHeight/40)" },
           "domain": false,
           "labels": false,
           "maxExtent": 0,
@@ -483,7 +483,7 @@
           "title": "created_at (year-month)",
           "labelFlush": true,
           "labelOverlap": true,
-          "tickCount": {"signal": "ceil(width/40)"},
+          "tickCount": { "signal": "ceil(width/40)" },
           "zindex": 0
         },
         {
@@ -492,7 +492,7 @@
           "grid": false,
           "title": "Count of Records",
           "labelOverlap": true,
-          "tickCount": {"signal": "ceil(childHeight/40)"},
+          "tickCount": { "signal": "ceil(childHeight/40)" },
           "zindex": 0
         }
       ]
@@ -503,8 +503,8 @@
       "style": "cell",
       "encode": {
         "update": {
-          "width": {"signal": "width"},
-          "height": {"signal": "childHeight"}
+          "width": { "signal": "width" },
+          "height": { "signal": "childHeight" }
         }
       },
       "signals": [
@@ -514,13 +514,13 @@
         },
         {
           "name": "selector003_tuple_fields",
-          "value": [{"type": "E", "field": "repo_name"}]
+          "value": [{ "type": "E", "field": "repo_name" }]
         },
         {
           "name": "selector003_modify",
           "on": [
             {
-              "events": {"signal": "selector003_tuple"},
+              "events": { "signal": "selector003_tuple" },
               "update": "modify(\"selector003_store\", selector003_tuple, true)"
             }
           ]
@@ -532,14 +532,14 @@
           "type": "rect",
           "style": ["bar"],
           "interactive": true,
-          "from": {"data": "data_2"},
+          "from": { "data": "data_2" },
           "encode": {
             "update": {
-              "fill": {"value": "#4c78a8"},
-              "x": {"scale": "concat_1_x", "field": "__count"},
-              "x2": {"scale": "concat_1_x", "value": 0},
-              "y": {"scale": "concat_1_y", "field": "type"},
-              "height": {"scale": "concat_1_y", "band": true}
+              "fill": { "value": "#4c78a8" },
+              "x": { "scale": "concat_1_x", "field": "__count" },
+              "x2": { "scale": "concat_1_x", "value": 0 },
+              "y": { "scale": "concat_1_y", "field": "type" },
+              "height": { "scale": "concat_1_y", "band": true }
             }
           }
         }
@@ -550,7 +550,7 @@
           "orient": "bottom",
           "gridScale": "concat_1_y",
           "grid": true,
-          "tickCount": {"signal": "ceil(width/40)"},
+          "tickCount": { "signal": "ceil(width/40)" },
           "domain": false,
           "labels": false,
           "maxExtent": 0,
@@ -565,7 +565,7 @@
           "title": "Count of Records",
           "labelFlush": true,
           "labelOverlap": true,
-          "tickCount": {"signal": "ceil(width/40)"},
+          "tickCount": { "signal": "ceil(width/40)" },
           "zindex": 0
         },
         {
@@ -583,22 +583,22 @@
     {
       "name": "concat_0_x",
       "type": "time",
-      "domain": {"data": "data_3", "field": "yearmonth_created_at"},
-      "range": [0, {"signal": "width"}]
+      "domain": { "data": "data_3", "field": "yearmonth_created_at" },
+      "range": [0, { "signal": "width" }]
     },
     {
       "name": "concat_0_y",
       "type": "linear",
-      "domain": {"data": "data_3", "field": "__count"},
-      "range": [{"signal": "childHeight"}, 0],
+      "domain": { "data": "data_3", "field": "__count" },
+      "range": [{ "signal": "childHeight" }, 0],
       "zero": false,
       "nice": true
     },
     {
       "name": "concat_1_x",
       "type": "linear",
-      "domain": {"data": "data_2", "field": "__count"},
-      "range": [0, {"signal": "width"}],
+      "domain": { "data": "data_2", "field": "__count" },
+      "range": [0, { "signal": "width" }],
       "nice": true,
       "zero": true
     },
@@ -608,9 +608,9 @@
       "domain": {
         "data": "data_1",
         "field": "type",
-        "sort": {"op": "min", "field": "__count", "order": "descending"}
+        "sort": { "op": "min", "field": "__count", "order": "descending" }
       },
-      "range": [0, {"signal": "childHeight"}],
+      "range": [0, { "signal": "childHeight" }],
       "paddingInner": 0.1,
       "paddingOuter": 0.05
     }

@@ -1,9 +1,6 @@
 ## Title
 
-
 Using Altair, Ibis, and Vega for interactive exploration of OmniSci databases
-
-
 
 ### Description
 
