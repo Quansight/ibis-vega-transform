@@ -1,8 +1,9 @@
 import { Kernel } from '@jupyterlab/services';
 import { PromiseDelegate } from '@lumino/coreutils';
-import { compile, extractTransforms, normalize, TopLevelSpec } from 'vega-lite';
+import { compile, normalize, TopLevelSpec } from 'vega-lite';
 import { initConfig } from 'vega-lite/build/src/config';
 
+import { extractTransforms } from './transformextract';
 const COMM_ID = 'ibis-vega-transform:compiler';
 
 /**
