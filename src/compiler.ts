@@ -24,6 +24,7 @@ export async function compileSpec(
     normalize(vlSpec as any, config),
     config
   );
+  console.log('Extracted Vega-Lite Spec', vlSpec);
   // TODO: Log extracted vl spec
   const vSpec = compile(extractSpec as any, { config }).spec;
 
