@@ -22,6 +22,9 @@ def altair_data_transformer(data):
     save the ibis expression globally with that name so we can pick it up later.
     """
     assert isinstance(data, pandas.DataFrame)
+    # If there is no ibis attribute, then reutrn the fallback
+    if not hasattr(data, "ibis"):
+        return altair.default_data_transformer(data)
     expr = data.ibis
 
     if get_fallback():
