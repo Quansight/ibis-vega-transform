@@ -44,6 +44,16 @@ Importing `ibis_vega_transform` sets the `altair` renderer and data transformer 
 
 Now, whenever you pass an `ibis` expression to a chart constructor, it will use the custom ibis renderer, which pushes all data aggregates to ibis, instead of in the browser.
 
+
+You can also set a debug flag, to have it instead pull in the first N rows of the ibis expression and use the default renderer. This is useful to see how the default pipeline would have rendered your chart. If you are getting some error, I reccomend setting this first to see if the error was on the Altair side or on the `ibis-vega-transform` side. If the fallback chart rendered correctly, it means the error is in this codebase. If it's wrong, then the error is in your code or in altair or in Vega.
+
+```python
+# enable fallback mode
+ibis_vega_transform.set_fallback(True)
+# disable fallback mode (the default)
+ibis_vega_transform.set_fallback(False)
+```
+
 ### Tracing
 
 If you want to see traces of the interactiosn for debugging and performance analysis,
