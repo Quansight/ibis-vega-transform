@@ -2,6 +2,8 @@ import { Kernel } from '@jupyterlab/services';
 import { PromiseDelegate } from '@lumino/coreutils';
 import { compile, normalize, TopLevelSpec } from 'vega-lite';
 import { initConfig } from 'vega-lite/build/src/config';
+import { mergeDeep } from 'vega-lite/build/src/util';
+import * as themes from 'vega-themes';
 
 import { extractTransforms } from './transformextract';
 const COMM_ID = 'ibis-vega-transform:compiler';
@@ -16,6 +18,16 @@ export async function compileSpec(
   span: any,
   rootSpan: any
 ): Promise<object> {
+  // For some reason we have to manually merge in the theme, like this used to do in the vega lite compiler
+  // otherwise it will generate an incorrect black background on a white theme
+  // https://github.com/vega/vega-lite/commit/7f5969ffefc35e3d583b0dec4b05bc14870747b4
+  const theme = (vlSpec.usermeta?.embedOptions as
+    | { theme?: string }
+    | undefined)?.theme;
+  if (theme) {
+    // @ts-ignore
+    mergeDeep(vlSpec, themes[theme]);
+  }
   // uses same logic as
   // https://github.com/vega/vega-lite/blob/a4ee4ec393d86b611f95486ad2e1902bfa3ed0cf/test/transformextract.test.ts#L133
 
@@ -25,7 +37,6 @@ export async function compileSpec(
     config
   );
   console.log('Extracted Vega-Lite Spec', vlSpec);
-  // TODO: Log extracted vl spec
   const vSpec = compile(extractSpec as any, { config }).spec;
 
   // Change vega transforms to ibis transforms on the server side.
