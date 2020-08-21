@@ -38,6 +38,12 @@ alt.Chart(table).mark_bar().encode(
 Check out the notebooks in the [`./examples/`](./examples/) directory to see
 some options using interactive charts and the OmniSci backend.
 
+## Usage
+
+Importing `ibis_vega_transform` sets the `altair` renderer and data transformer to `"ibis"`. It also monkeypatches the Ibis chart constructor to handle `ibis` expressions.
+
+Now, whenever you pass an `ibis` expression to a chart constructor, it will use the custom ibis renderer, which pushes all data aggregates to ibis, instead of in the browser.
+
 ### Tracing
 
 If you want to see traces of the interactiosn for debugging and performance analysis,

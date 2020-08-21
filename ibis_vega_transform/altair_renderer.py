@@ -15,11 +15,12 @@ def altair_renderer(spec):
     """
     An altair renderer that serves our custom mimetype with ibis support.
     """
-    if get_fallback():
+    active_span = get_active_span()
+    # If we don't have an active span, this means we have gone through the data transform
+    # on any ibis expressions.s
+    if get_fallback() or not active_span:
         return altair.vegalite.v3.display.default_renderer(spec)
 
-    active_span = get_active_span()
-    assert active_span
     injected_span: typing.Dict = {}
     tracer.inject(active_span, opentracing.Format.TEXT_MAP, injected_span)
     active_span.log_kv({"vega-lite:initial": spec})

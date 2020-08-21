@@ -54,7 +54,7 @@ const enum StateEnum {
   fetching = 'fetching',
   fetched = 'fetched'
 }
-
+// Add way to throw away data if wrong returned
 type State =
   | { state: StateEnum.initial }
   | { state: StateEnum.fetching; aborted: boolean }
