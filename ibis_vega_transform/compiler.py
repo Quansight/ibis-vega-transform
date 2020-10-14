@@ -4,7 +4,7 @@ import typing
 
 import opentracing
 
-from .globals import DATA_NAME_PREFIX, _expr_map
+from .globals import DATA_NAME_PREFIX, _expr_map, debug
 from .tracer import tracer
 
 __all__ = ["compiler_target_function"]
@@ -44,11 +44,13 @@ def compiler_target_function(comm, msg):
 
     with tracer.start_span("compile-vega", references=root_ref) as span:
         span.log_kv({"vega-spec:initial": spec})
+        debug("vega-spec:initial", spec)
 
         try:
             with tracer.start_span("transform-vega", child_of=span) as transform_span:
                 updated_spec = _transform(spec, root_span)
                 transform_span.log_kv({"vega-spec:transformed": updated_spec})
+                span.log_kv({"vega-spec:transformed": updated_spec})
 
             comm.send(updated_spec)
         except ValueError as e:

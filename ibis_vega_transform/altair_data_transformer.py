@@ -8,6 +8,7 @@ from .globals import (
     get_active_span,
     get_fallback,
     set_active_span,
+    debug,
 )
 from .tracer import tracer
 
@@ -33,8 +34,9 @@ def altair_data_transformer(data):
     if not get_active_span():
         set_active_span(tracer.start_span("altair", tags={tags.SERVICE: "kernel"}))
 
-    get_active_span().log_kv({"sql:initial": expr.compile()})
-
+    sql = expr.compile()
+    get_active_span().log_kv({"sql:initial": sql})
+    debug("sql:initial", {"sql": sql})
     h = str(hash(expr))
     name = f"{DATA_NAME_PREFIX}{h}"
     _expr_map[h] = expr

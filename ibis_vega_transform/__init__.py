@@ -15,7 +15,7 @@ from .altair_monkeypatch import monkeypatch_altair
 from .altair_renderer import altair_renderer
 from .compiler import compiler_target_function
 from .core import apply
-from .globals import _expr_map, set_fallback
+from .globals import _expr_map, set_fallback, enable_debug, disable_debug
 from .query import query_target_func
 
 

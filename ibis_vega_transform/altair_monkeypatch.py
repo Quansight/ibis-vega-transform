@@ -1,3 +1,4 @@
+from ibis_vega_transform.globals import reset_debug
 import warnings
 
 import altair
@@ -21,6 +22,7 @@ def monkeypatch_altair():
         those types and set the `ibis` attribute to the original ibis expression.
         """
         if data is not None and isinstance(data, ibis.Expr):
+            reset_debug()
             expr = data
             data = empty_dataframe(expr)
             data.ibis = expr

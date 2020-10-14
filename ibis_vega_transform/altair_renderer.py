@@ -2,7 +2,7 @@ import altair
 import opentracing
 import typing
 
-from .globals import get_active_span, get_fallback, set_active_span
+from .globals import get_active_span, get_fallback, set_active_span, debug
 from .tracer import tracer
 
 __all__ = ["altair_renderer"]
@@ -24,6 +24,7 @@ def altair_renderer(spec):
     injected_span: typing.Dict = {}
     tracer.inject(active_span, opentracing.Format.TEXT_MAP, injected_span)
     active_span.log_kv({"vega-lite:initial": spec})
+    debug("vega-lite:initial", spec)
     active_span.finish()
     set_active_span(None)
 

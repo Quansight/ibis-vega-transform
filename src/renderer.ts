@@ -100,7 +100,8 @@ export class IbisVegaRenderer extends Widget implements IRenderMime.IRenderer {
     const res = await vegaEmbed(this.node, vSpec, {
       actions: true,
       defaultStyle: true,
-      mode: 'vega'
+      mode: 'vega',
+
     });
     this._view = res.view;
 

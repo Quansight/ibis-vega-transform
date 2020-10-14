@@ -13,7 +13,7 @@ import altair.vegalite.v3.display
 import opentracing
 
 from .core import apply
-from .globals import _expr_map
+from .globals import _expr_map, debug
 from .tracer import tracer
 
 __all__ = ["query_target_func"]
@@ -84,7 +84,12 @@ def execute_query(parameters: dict):
         if name not in _expr_map:
             raise ValueError(f"{name} is not an expression known to us!")
         expr = _expr_map[name]
-        scope.span.log_kv({"sql:initial": expr.compile()})
+        sql = expr.compile()
+        scope.span.log_kv({"sql:initial": sql})
+        debug(
+            "query:initial",
+            {"transforms": transforms, "parameters": parameters, "sql": sql},
+        )
         if transforms:
             # Replace all string instances of data references with value in schema
             for k, v in parameters.items():
@@ -106,12 +111,15 @@ def execute_query(parameters: dict):
                     f"Failed to convert {transforms} with error message message '{e}'"
                 )
         with tracer.start_span("ibis:execute") as execute_span:
-            execute_span.log_kv({"sql": expr.compile()})
+            sql = expr.compile()
+            execute_span.log_kv({"sql": sql})
             if ENABLE_MULTIPROCESSING:
                 data = execute_new_client(expr)
             else:
                 data = expr.execute()
-        return altair.to_values(data)["values"]
+        values = altair.to_values(data)["values"]
+        debug("query:result", {"transforms": transforms, "sql": sql, "values": values})
+        return values
 
 
 def _patch_vegaexpr(expr: str, name: str, value: str) -> str:
