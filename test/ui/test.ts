@@ -217,8 +217,8 @@ async function compareCharts(
 describe('Test Ibis-Vega-Transform', () => {
   it.each([
     // File name, chart amount, timeout (ms)
-    ['charting-example', 1, 60 * 1000],
-    ['ibis-altair-extraction', 4, 30 * 1000],
+    ['charting-example', 7, 60 * 1000],
+    ['ibis-altair-extraction', 4, 40 * 1000],
     ['interactive-slider', 1, 10 * 1000],
     ['omnisci-vega-example', 1, 15 * 1000],
     ['performance-charts', 2, 15 * 1000],

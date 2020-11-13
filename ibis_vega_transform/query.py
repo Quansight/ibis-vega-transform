@@ -5,8 +5,17 @@ import json
 import re
 import typing
 import concurrent.futures
+import warnings
+
 import ibis.client
-import ibis.omniscidb
+
+try:
+    # ibis version >= 1.4
+    from ibis.backends import omniscidb as ibis_omniscidb
+except ImportError as msg:
+    # ibis version < 1.4
+    warnings.warn(str(msg))
+    from ibis import omniscidb as ibis_omniscidb
 
 import altair
 import altair.vegalite.v3.display
@@ -33,9 +42,9 @@ def execute_new_client(expr):
     Execute with new connection b/c connections are not threadsafe
     """
     (backend,) = list(ibis.client.find_backends(expr))
-    assert isinstance(backend, ibis.omniscidb.OmniSciDBClient)
+    assert isinstance(backend, ibis_omniscidb.OmniSciDBClient)
     with tracer.start_span("ibis:execute:new-client") as execute_span:
-        new_client = ibis.omniscidb.OmniSciDBClient(
+        new_client = ibis_omniscidb.OmniSciDBClient(
             uri=backend.uri,
             host=backend.host,
             port=backend.port,
