@@ -26,7 +26,8 @@ source = pd.DataFrame({
     'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]
 })
 
-connection = ibis.pandas.connect({'source': source })
+# or ibis.pandas if ibis version < 1.4
+connection = ibis.backends.pandas.connect({'source': source })
 table = connection.table('source')
 
 alt.Chart(table).mark_bar().encode(
@@ -43,7 +44,6 @@ some options using interactive charts and the OmniSci backend.
 Importing `ibis_vega_transform` sets the `altair` renderer and data transformer to `"ibis"`. It also monkeypatches the Ibis chart constructor to handle `ibis` expressions.
 
 Now, whenever you pass an `ibis` expression to a chart constructor, it will use the custom ibis renderer, which pushes all data aggregates to ibis, instead of in the browser.
-
 
 You can also set a debug flag, to have it instead pull in the first N rows of the ibis expression and use the default renderer. This is useful to see how the default pipeline would have rendered your chart. If you are getting some error, I reccomend setting this first to see if the error was on the Altair side or on the `ibis-vega-transform` side. If the fallback chart rendered correctly, it means the error is in this codebase. If it's wrong, then the error is in your code or in altair or in Vega.
 

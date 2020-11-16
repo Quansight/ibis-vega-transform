@@ -4,8 +4,13 @@ channels:
 dependencies:
   - jaeger
   - jupyterlab>=2
-  - pymapd
-  - python>=3.7
+  # force the pandas used by pymapd
+  - pandas <0.26,>=0.25
+  # use the latest version of pymapd to keep compatibility with ibis
+  # - pymapd >=0.24
+  # ibis doesn't support python 3.6 anymore
+  # ibis.omniscidb doesn't support 3.8 yet
+  - python 3.7
   - nodejs>=12
   - notebook
   - tornado

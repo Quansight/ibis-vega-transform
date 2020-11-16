@@ -60,7 +60,7 @@ setuptools.setup(
         "vega_datasets",
     ],
     extras_require={"dev": ["black"]},
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     include_package_data=True,
     classifiers=[
         'Operating System :: OS Independent',

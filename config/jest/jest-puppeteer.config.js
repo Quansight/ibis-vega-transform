@@ -5,13 +5,17 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
+let os = require('os');
+
 const portNumber = 8080;
 let browserExecutablePath = '';
 
 // Use Chrome if running test suit locally
 if (process.env.CI !== 'true') {
-  browserExecutablePath =
-    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  if (os.type() === 'Darwin') {
+    browserExecutablePath =
+      '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  }
 }
 
 const config = {

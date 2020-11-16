@@ -105,8 +105,7 @@ def isBoolean(value: Any) -> bool:
 
 
 def isDate(value: Any) -> bool:
-    """Returns true if value is a Date object, false otherwise.
-    """
+    """Returns true if value is a Date object, false otherwise."""
     return isinstance(value, it.TemporalValue)
 
 

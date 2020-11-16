@@ -149,14 +149,17 @@ def _extract_used_data(transforms) -> typing.Set[str]:
     return {m.group(1) for m in re.finditer(r'data\("(.+?)"\)', str(transforms))}
 
 
-assert _extract_used_data(
-    [
-        {
-            "type": "filter",
-            "expr": '!(length(data("Filter_store"))) || (vlSelectionTest("Filter_store", datum))',
-        }
-    ]
-) == {"Filter_store"}
+assert (
+    _extract_used_data(
+        [
+            {
+                "type": "filter",
+                "expr": '!(length(data("Filter_store"))) || (vlSelectionTest("Filter_store", datum))',
+            }
+        ]
+    )
+    == {"Filter_store"}
+)
 
 
 def _is_ibis(name: str) -> bool:
