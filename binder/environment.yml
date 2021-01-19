@@ -10,7 +10,9 @@ dependencies:
   # ibis doesn't support python 3.6 anymore
   # ibis.omniscidb doesn't support 3.8 yet
   - python
-  - nodejs >=12
+  # issue with nodejs 15
+  # https://github.com/Automattic/node-canvas/issues/1319#issuecomment-757505904
+  - nodejs >=12,<15
   - notebook
   - tornado
   - graphviz
