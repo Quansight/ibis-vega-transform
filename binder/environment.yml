@@ -3,15 +3,16 @@ channels:
   - conda-forge
 dependencies:
   - jaeger
-  - jupyterlab>=2
+  - jupyterlab 2.*
   # force the pandas used by pymapd
-  - pandas <0.26,>=0.25
-  # use the latest version of pymapd to keep compatibility with ibis
-  # - pymapd >=0.24
+  - pandas
+  - pymapd
   # ibis doesn't support python 3.6 anymore
   # ibis.omniscidb doesn't support 3.8 yet
-  - python 3.7
-  - nodejs>=12
+  - python
+  # issue with nodejs 15
+  # https://github.com/Automattic/node-canvas/issues/1319#issuecomment-757505904
+  - nodejs >=12,<15
   - notebook
   - tornado
   - graphviz
