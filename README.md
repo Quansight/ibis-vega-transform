@@ -56,7 +56,7 @@ ibis_vega_transform.set_fallback(False)
 
 ### Tracing
 
-If you want to see traces of the interactiosn for debugging and performance analysis,
+If you want to see traces of the interactions for debugging and performance analysis,
 install the `jaeger-all-in-one` binary and the `jupyterlab-server-proxy`
 lab extension to see the Jaeger icon in the launcher.
 
