@@ -52,7 +52,7 @@ setuptools.setup(
         "ibis-framework>=1.3.0",
         "jaeger-client",
         "jupyter_jaeger>=1.0.3",
-        "jupyterlab>=2.0.0",
+        "jupyterlab>=2.0.0,<3",
         "mypy_extensions",
         "pymapd",
         "tornado",
@@ -65,7 +65,6 @@ setuptools.setup(
     classifiers=[
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
