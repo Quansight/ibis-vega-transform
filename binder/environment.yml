@@ -6,13 +6,11 @@ dependencies:
   - jupyterlab 2.*
   # force the pandas used by pymapd
   - pandas
-  - pymapd
+  - pymapd 0.24.*
   # ibis doesn't support python 3.6 anymore
   # ibis.omniscidb doesn't support 3.8 yet
-  - python
-  # issue with nodejs 15
-  # https://github.com/Automattic/node-canvas/issues/1319#issuecomment-757505904
-  - nodejs >=12,<15
+  - python 3.7.*
+  - nodejs
   - notebook
   - tornado
   - graphviz
