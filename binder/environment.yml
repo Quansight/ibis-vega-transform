@@ -4,6 +4,7 @@ channels:
 dependencies:
   - jaeger
   - jupyterlab 3.*
+  - jupyter-packaging 0.7.12
   # force the pandas used by pymapd
   - pandas
   - pymapd 0.24.*

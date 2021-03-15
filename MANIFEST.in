@@ -2,3 +2,26 @@ include setup.py
 include README.md
 include LICENSE.txt
 include MANIFEST.in
+
+
+
+
+include pyproject.toml
+include package.json
+include install.json
+include ts*.json
+
+graft ibis_vega_transform
+
+# Javascript files
+graft src
+graft style
+prune **/node_modules
+prune lib
+
+# Patterns to exclude from any directory
+global-exclude *~
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .git
+global-exclude .ipynb_checkpoints

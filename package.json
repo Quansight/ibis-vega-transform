@@ -25,7 +25,11 @@
     "url": "https://github.com/Quansight/ibis-vega-transform.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:labextension": "jupyter labextension install .",
+    "build:labextension:dev": "jupyter labextension install .",
+    "build:lib": "tsc",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "prepublish": "jlpm run clean && jlpm run build",
     "prettier": "prettier --write '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}'",
