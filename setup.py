@@ -52,7 +52,7 @@ setuptools.setup(
         "ibis-framework>=1.3.0",
         "jaeger-client",
         "jupyter_jaeger>=1.0.3",
-        "jupyterlab>=2.0.0,<3",
+        "jupyterlab~=3.0",
         "mypy_extensions",
         "pymapd",
         "tornado",

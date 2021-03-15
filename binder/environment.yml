@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - jaeger
-  - jupyterlab 2.*
+  - jupyterlab 3.*
   # force the pandas used by pymapd
   - pandas
   - pymapd 0.24.*

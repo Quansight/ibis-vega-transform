@@ -35,10 +35,10 @@
     "test:debug": "env HEADLESS=false SLOWMO=true jlpm test"
   },
   "dependencies": {
-    "@jupyterlab/application": "^2.0.2",
-    "@jupyterlab/docregistry": "^2.0.2",
-    "@jupyterlab/notebook": "^2.0.2",
-    "@jupyterlab/rendermime-interfaces": "^2.0.1",
+    "@jupyterlab/application": "^3.0.0",
+    "@jupyterlab/docregistry": "^3.0.0",
+    "@jupyterlab/notebook": "^3.0.0",
+    "@jupyterlab/rendermime-interfaces": "^3.0.0",
     "@jupyterlab/services": "^5.0.2",
     "@lumino/coreutils": "^1.4.2",
     "@lumino/widgets": "^1.11.1",
