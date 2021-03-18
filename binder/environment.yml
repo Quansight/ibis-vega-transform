@@ -7,6 +7,10 @@ dependencies:
   # force the pandas used by pymapd
   - pandas
   - pymapd 0.24.*
+  # AttributeError: module 'sqlalchemy' has no attribute 'Binary'
+  # https://stackoverflow.com/questions/65851741/attributeerror-module-sqlalchemy-has-no-attribute-binary
+  # this is used by ibis, maybe it should be pinned or fixed in the next version.
+  - sqlalchemy <1.4
   # ibis doesn't support python 3.6 anymore
   # ibis.omniscidb doesn't support 3.8 yet
   - python 3.7.*
