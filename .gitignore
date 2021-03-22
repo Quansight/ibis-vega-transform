@@ -23,6 +23,7 @@ package-lock.json
 yarn.lock
 *.orig
 report.*.json
+static
 
 # Rever
 rever/

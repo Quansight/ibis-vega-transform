@@ -199,6 +199,7 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
         this._state = { state: StateEnum.fetched, data: res };
         return (df: any) => df.touch(this);
       }
+      /* tslint:disable:no-empty */
       return () => {};
     });
     return { async: p };
@@ -210,6 +211,7 @@ class QueryIbis extends dataflow.Transform implements vega.Transform {
    */
   output(pulse: any, data: any) {
     data.forEach(dataflow.ingest);
+    // tslint:disable-next-line:no-bitwise
     const out = pulse.fork(pulse.NO_FIELDS & pulse.NO_SOURCE);
     out.rem = this.value;
     this.value = out.source = out.add = data;
