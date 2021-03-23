@@ -35,11 +35,11 @@
     "test:debug": "env HEADLESS=false SLOWMO=true jlpm test"
   },
   "dependencies": {
-    "@jupyterlab/application": "^2.0.2",
-    "@jupyterlab/docregistry": "^2.0.2",
-    "@jupyterlab/notebook": "^2.0.2",
-    "@jupyterlab/rendermime-interfaces": "^2.0.1",
-    "@jupyterlab/services": "^5.0.2",
+    "@jupyterlab/application": "^3.0.0",
+    "@jupyterlab/docregistry": "^3.0.0",
+    "@jupyterlab/notebook": "^3.0.0",
+    "@jupyterlab/rendermime-interfaces": "^3.0.0",
+    "@jupyterlab/services": "^6.0.5",
     "@lumino/coreutils": "^1.4.2",
     "@lumino/widgets": "^1.11.1",
     "jupyter-jaeger": "^1.0.1",
@@ -72,7 +72,8 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0",
     "tslint-react": "^4.0.0",
-    "typescript": "~3.8.3"
+    "typescript": "~3.8.3",
+    "@jupyterlab/builder": "^3.0.5"
   },
   "sideEffects": [
     "style/*.css"

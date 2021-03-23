@@ -73,7 +73,7 @@ async function getElement(selector: string, text: string) {
 async function clickMenuItem(menuString: string, subMenuString: string) {
   let menuItems: { [index: string]: any } = {
     File: {
-      'Close and  Shutdown Notebook': { popup: 'OK' },
+      'Close and Shutdown Notebook': { popup: 'OK' },
       'Save Notebook': { popup: '' }
     },
     Edit: {
@@ -101,6 +101,7 @@ async function clickMenuItem(menuString: string, subMenuString: string) {
     '.p-MenuBar-menu > ul > li[data-type="command"]',
     subMenuString
   );
+
   await page.evaluate(el => (el.style.background = 'red'), subMenuElement);
   await page.waitFor(1 * 1000);
   await page.evaluate(el => (el.style.background = ''), subMenuElement);
@@ -294,7 +295,7 @@ describe('Test Ibis-Vega-Transform', () => {
       });
 
       // Close and shutdown
-      await clickMenuItem('File', 'Close and  Shutdown Notebook');
+      await clickMenuItem('File', 'Close and Shutdown Notebook');
       await page.waitFor(4 * 1000);
     }
   );
