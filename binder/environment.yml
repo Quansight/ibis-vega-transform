@@ -2,9 +2,10 @@ name: ibis-vega-transform
 channels:
   - conda-forge
 dependencies:
+  - yarn
   - jaeger
   - jupyterlab 3.*
-  - jupyter-packaging 0.7.12
+  - jupyter-packaging 0.8.1
   # force the pandas used by pymapd
   - pandas
   - pymapd 0.24.*
@@ -22,3 +23,10 @@ dependencies:
   - altair
   - pip
   - black
+
+  # fix conflicts
+  # error: chardet 4.0.0 is installed but chardet<4.0,>=2.0 is required by {'aiohttp'}
+  - chardet<4.0,>=2.0
+  # pymapd 0.24.2 has requirement pyarrow==0.15.0, but you have pyarrow 0.15.1
+  - pyarrow 0.15.0
+  - arrow-cpp 0.15.0

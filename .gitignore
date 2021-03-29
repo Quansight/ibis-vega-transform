@@ -24,6 +24,7 @@ yarn.lock
 *.orig
 report.*.json
 static
+ibis_vega_transform/labextension
 
 # Rever
 rever/

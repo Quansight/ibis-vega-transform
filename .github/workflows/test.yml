@@ -32,9 +32,6 @@ jobs:
           jlpm
           jlpm run tslint
           pip install -e ".[dev]"
-          jupyter labextension install . --no-build
-          jupyter labextension build
-          jupyter lab build
       - name: Test example notebooks
         shell: bash -l {0}
         run: xvfb-run --auto-servernum jlpm test

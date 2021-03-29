@@ -1,0 +1,7 @@
+{
+  "ServerApp": {
+    "jpserver_extensions": {
+      "ibis_vega_transform": true
+    }
+  }
+}

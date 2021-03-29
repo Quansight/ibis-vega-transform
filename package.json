@@ -26,17 +26,25 @@
   },
   "scripts": {
     "build": "jlpm run build:lib && jlpm run build:labextension:dev",
-    "build:labextension": "jupyter labextension install .",
-    "build:labextension:dev": "jupyter labextension install .",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
     "build:lib": "tsc",
     "build:prod": "jlpm run build:lib && jlpm run build:labextension",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "clean": "jlpm run clean:lib && jlpm run clean:labextension",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension && jlpm clean:modules",
+    "clean:labextension": "rimraf ibis_vega_transform/labextension",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:modules": "rimraf node_modules",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "prepare": "jlpm run clean && jlpm run build:prod",
     "prepublish": "jlpm run clean && jlpm run build",
     "prettier": "prettier --write '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}'",
     "tslint": "tslint -c tslint.json --project tsconfig.json '**/*{.ts,.tsx}'",
-    "watch": "tsc -w",
     "test": "env JEST_PUPPETEER_CONFIG=./config/jest/jest-puppeteer.config.js jest --runInBand --verbose=true --detectOpenHandles --config ./config/jest/jest.config.js",
-    "test:debug": "env HEADLESS=false SLOWMO=true jlpm test"
+    "test:debug": "env HEADLESS=false SLOWMO=true jlpm test",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:labextension": "jupyter labextension watch .",
+    "watch:src": "tsc -w"
   },
   "dependencies": {
     "@jupyterlab/application": "^3.0.0",
@@ -83,7 +91,30 @@
     "style/*.css"
   ],
   "jupyterlab": {
-    "extension": true
+    "discovery": {
+      "server": {
+        "managers": [
+          "pip",
+          "conda"
+        ],
+        "base": {
+          "name": "ibis-vega-transform"
+        }
+      }
+    },
+    "extension": true,
+    "sharedPackages": {
+      "@material-ui/core": {
+        "singleton": true
+      },
+      "@material-ui/icons": {
+        "singleton": true
+      },
+      "@material-ui/lab": {
+        "singleton": true
+      }
+    },
+    "outputDir": "ibis_vega_transform/labextension"
   },
   "husky": {
     "hooks": {

@@ -4,6 +4,7 @@ This module provides a Python implementation of Vega transforms,
 evaluated with ibis expressions.
 The main function is the ``ibis_vega_transform.apply()`` function.
 """
+from ._version import __version__, version_info
 
 # Third party imports
 import altair
@@ -17,25 +18,6 @@ from .compiler import compiler_target_function
 from .core import apply
 from .globals import _expr_map, set_fallback, enable_debug, disable_debug
 from .query import query_target_func
-
-
-# Constants
-def _to_version_info(version):
-    """Convert a version string to a number and string tuple."""
-    parts = []
-    for part in version.split("."):
-        try:
-            part = int(part)
-        except ValueError:
-            pass
-
-        parts.append(part)
-
-    return tuple(parts)
-
-
-__version__ = "5.2.2"
-version_info = _to_version_info(__version__)
 
 
 ##
