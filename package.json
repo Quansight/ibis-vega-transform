@@ -29,15 +29,17 @@
     "build:labextension": "jupyter labextension build .",
     "build:labextension:dev": "jupyter labextension build --development True .",
     "build:lib": "tsc",
-    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension && jlpm run install:labextension",
+    "build:jlab": "jupyter lab build",
+    "build:pre-install": "jlpm && jlpm run tslint",
+    "build:post-install": "jlpm build:lib && jlpm run install:labextension && jlpm run build:labextension && jlpm run build:jlab",
     "clean": "jlpm run clean:lib && jlpm run clean:labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension && jlpm clean:modules",
     "clean:labextension": "rimraf ibis_vega_transform/labextension",
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:modules": "rimraf node_modules",
-    "install:extension": "jupyter labextension develop --overwrite .",
-    "prepare": "jlpm run clean && jlpm run build:prod",
-    "prepublish": "jlpm run clean && jlpm run build",
+    "install:labextension": "jupyter labextension install . --no-build",
+    "install:labextension:dev": "jupyter labextension develop --overwrite",
     "prettier": "prettier --write '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}'",
     "tslint": "tslint -c tslint.json --project tsconfig.json '**/*{.ts,.tsx}'",
     "test": "env JEST_PUPPETEER_CONFIG=./config/jest/jest-puppeteer.config.js jest --runInBand --verbose=true --detectOpenHandles --config ./config/jest/jest.config.js",
@@ -60,6 +62,7 @@
     "vega-lite": "^4.13.1"
   },
   "devDependencies": {
+    "@jupyterlab/builder": "^3.0.5",
     "@types/expect-puppeteer": "^3.3.2",
     "@types/jaeger-client": "3.15.3",
     "@types/jest": "^24.0.25",
@@ -84,8 +87,7 @@
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0",
     "tslint-react": "^4.0.0",
-    "typescript": "~3.8.3",
-    "@jupyterlab/builder": "^3.0.5"
+    "typescript": "~3.8.3"
   },
   "sideEffects": [
     "style/*.css"

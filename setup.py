@@ -58,9 +58,19 @@ from packaging.version import parse
 
 try:
     from jupyter_packaging import wrap_installers, npm_builder
-    builder = npm_builder(build_cmd="build:prod")
-    builder.__name__ = "pre_develop"
-    cmdclass = wrap_installers(pre_develop=builder)
+
+    pre_builder = npm_builder(build_cmd="build:pre-install", npm=["jlpm"])
+    pre_builder.__name__ = "pre_develop"
+
+    post_builder = npm_builder(build_cmd="build:post-install", npm=["jlpm"])
+    post_builder.__name__ = "post_develop"
+
+    cmdclass = wrap_installers(
+        pre_develop=pre_builder,
+        pre_dist=pre_builder,
+        post_develop=post_builder,
+        post_dist=post_builder
+    )
 except ImportError:
     cmdclass = {}
 

@@ -28,10 +28,7 @@ jobs:
         run: conda list
       - name: Install Ibis Vega Transform extension
         shell: bash -l {0}
-        run: |
-          jlpm
-          jlpm run tslint
-          pip install -e ".[dev]"
+        run: python setup.py develop
       - name: Test example notebooks
         shell: bash -l {0}
         run: xvfb-run --auto-servernum jlpm test

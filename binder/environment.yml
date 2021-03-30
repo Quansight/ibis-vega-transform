@@ -2,7 +2,6 @@ name: ibis-vega-transform
 channels:
   - conda-forge
 dependencies:
-  - yarn
   - jaeger
   - jupyterlab 3.*
   - jupyter-packaging 0.8.1
@@ -16,7 +15,7 @@ dependencies:
   # ibis doesn't support python 3.6 anymore
   # ibis.omniscidb doesn't support 3.8 yet
   - python 3.7.*
-  - nodejs
+  - nodejs 14.*
   - notebook
   - tornado
   - graphviz
