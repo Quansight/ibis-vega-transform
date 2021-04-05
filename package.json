@@ -59,7 +59,6 @@
     "vega": "^5.13.0",
     "vega-embed": "^6.10.0",
     "vega-lite": "^4.13.1"
-
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
@@ -100,14 +99,14 @@
   "styleModule": "style/index.js",
   "jupyterlab": {
     "discovery": {
-        "server": {
-          "managers": [
-            "pip"
-          ],
-          "base": {
-            "name": "ibis_vega_transform"
-          }
+      "server": {
+        "managers": [
+          "pip"
+        ],
+        "base": {
+          "name": "ibis_vega_transform"
         }
+      }
     },
     "extension": true,
     "outputDir": "ibis_vega_transform/labextension"

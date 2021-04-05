@@ -9,6 +9,7 @@ import concurrent.futures
 import ibis.client
 
 import ibis
+
 ibis_omniscidb = ibis.omniscidb
 
 import altair

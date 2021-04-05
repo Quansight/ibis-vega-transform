@@ -1,4 +1,4 @@
-__all__ = ['__version__', 'version_info']
+__all__ = ["__version__", "version_info"]
 
 
 def _fetchVersion():
@@ -9,12 +9,12 @@ def _fetchVersion():
 
     for d, _, _ in os.walk(HERE):
         try:
-            with open(os.path.join(d, 'package.json')) as f:
-                return json.load(f)['version']
+            with open(os.path.join(d, "package.json")) as f:
+                return json.load(f)["version"]
         except FileNotFoundError:
             pass
 
-    raise FileNotFoundError('Could not find package.json under dir {}'.format(HERE))
+    raise FileNotFoundError("Could not find package.json under dir {}".format(HERE))
 
 
 def _to_version_info(version):
