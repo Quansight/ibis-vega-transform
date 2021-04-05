@@ -1,14 +1,24 @@
-# ibis-vega-transform <br /> [![binder logo](https://beta.mybinder.org/badge.svg)](https://mybinder.org/v2/gh/Quansight/ibis-vega-transform/master?urlpath=lab/tree/examples/vega-compiler.ipynb) [![Tests](https://github.com/Quansight/ibis-vega-transform/workflows/Run%20tests%20on%20example%20notebooks/badge.svg)](https://github.com/Quansight/ibis-vega-transform/actions?query=workflow%3A%22Run+tests+on+example+notebooks%22) [![](https://img.shields.io/pypi/v/ibis-vega-transform.svg?style=flat-square)](https://pypi.python.org/pypi/ibis-vega-transform) [![](https://img.shields.io/npm/v/ibis-vega-transform.svg?style=flat-square)](https://www.npmjs.com/package/ibis-vega-transform)
+# ibis-vega-transform  <br /> [![binder logo](https://beta.mybinder.org/badge.svg)](https://mybinder.org/v2/gh/Quansight/ibis-vega-transform/master?urlpath=lab/tree/examples/vega-compiler.ipynb) [![Tests](https://github.com/Quansight/ibis-vega-transform/workflows/Run%20tests%20on%20example%20notebooks/badge.svg)](https://github.com/Quansight/ibis-vega-transform/actions?query=workflow%3A%22Run+tests+on+example+notebooks%22) [![](https://img.shields.io/pypi/v/ibis-vega-transform.svg?style=flat-square)](https://pypi.python.org/pypi/ibis-vega-transform) [![](https://img.shields.io/npm/v/ibis-vega-transform.svg?style=flat-square)](https://www.npmjs.com/package/ibis-vega-transform) ![Github Actions Status](https://github.com/Quansight/ibis-vega-transform/workflows/Build/badge.svg)[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/Quansight/ibis-vega-transform/master?urlpath=lab)
+
+A JupyterLab extension for performing Vega transforms lazily using Ibis.
 
 Python evaluation of Vega transforms using Ibis expressions.
 
 For inspiration, see https://github.com/jakevdp/altair-transform
 
+This extension is composed of a Python package named `ibis_vega_transform`
+for the server extension and a NPM package named `ibis_vega_transform`
+for the frontend extension.
+
+
+## Requirements
+
+* JupyterLab >= 3.0
+
 ## Getting started
 
 ```sh
 pip install ibis-vega-transform
-jupyter labextension install ibis-vega-transform
 ```
 
 Then in a notebook, import the Python package and pass in an ibis expression
@@ -80,23 +90,66 @@ sudo sysctl net.inet.udp.maxdgram=200000
 echo net.inet.udp.maxdgram=200000 | sudo tee -a /etc/sysctl.conf
 ```
 
-## Development
+## Troubleshoot
 
-To install from source, run the following in a terminal:
+If you are seeing the frontend extension, but it is not working, check
+that the server extension is enabled:
 
-```sh
+```bash
+jupyter server extension list
+```
+
+If the server extension is installed and enabled, but you are not seeing
+the frontend extension, check the frontend extension is installed:
+
+```bash
+jupyter labextension list
+```
+
+
+## Contributing
+
+### Development install
+
+Note: You will need NodeJS to build the extension package.
+
+The `jlpm` command is JupyterLab's pinned version of
+[yarn](https://yarnpkg.com/) that is installed with JupyterLab. You may use
+`yarn` or `npm` in lieu of `jlpm` below.
+
+```bash
+# Clone the repo to your local environment
 git clone git@github.com:Quansight/ibis-vega-transform.git
 
+# Change directory to the ibis-vega-transform directory and
+# Create a conda environment
 cd ibis-vega-transform
 conda env create -f binder/environment.yml
 conda activate ibis-vega-transform
 
-pip install -e ".[dev]"
-jlpm
-jupyter labextension install . --no-build
+# Install package in development mode
+pip install -e .
+# Link your development version of the extension with JupyterLab
+jupyter labextension develop . --overwrite
+# Rebuild extension Typescript source after making changes
+jlpm run build
+```
 
-jupyter lab --watch
+You can watch the source directory and run JupyterLab at the same time in different terminals to watch for changes in the extension's source and automatically rebuild the extension.
+
+```bash
+# Watch the source directory in one terminal, automatically rebuilding when needed
 jlpm run watch
+# Run JupyterLab in another terminal
+jupyter lab
+```
+
+With the watch command running, every saved change will immediately be built locally and available in your running JupyterLab. Refresh JupyterLab to load the change in your browser (you may need to wait several seconds for the extension to be rebuilt).
+
+By default, the `jlpm run build` command generates the source maps for this extension to make it easier to debug using the browser dev tools. To also generate source maps for the JupyterLab core extensions, you can run the following command:
+
+```bash
+jupyter lab build --minimize=False
 ```
 
 A pre-commit hook is installed usig Husky (Git > 2.13 is required!) to format files.
@@ -112,3 +165,10 @@ jlpm run prettier
 
 We are using [`jupyter-jaeger`](https://github.com/Quansight/jupyter-jaeger) to trace each interaction
 for benchmarking.
+
+
+### Uninstall
+
+```bash
+pip uninstall ibis-vega-transform
+```

@@ -1,15 +1,12 @@
-include setup.py
+include LICENSE
 include README.md
-include LICENSE.txt
-include MANIFEST.in
-
 include pyproject.toml
+include jupyter-config/ibis_vega_transform.json
+
 include package.json
 include install.json
 include ts*.json
-include jupyter-config/ibis_vega_transform.json
 
-graft ibis_vega_transform
 graft ibis_vega_transform/labextension
 
 # Javascript files

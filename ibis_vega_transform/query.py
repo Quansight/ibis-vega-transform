@@ -5,17 +5,11 @@ import json
 import re
 import typing
 import concurrent.futures
-import warnings
 
 import ibis.client
 
-try:
-    # ibis version >= 1.4
-    from ibis.backends import omniscidb as ibis_omniscidb
-except ImportError as msg:
-    # ibis version < 1.4
-    warnings.warn(str(msg))
-    from ibis import omniscidb as ibis_omniscidb
+import ibis
+ibis_omniscidb = ibis.omniscidb
 
 import altair
 import altair.vegalite.v3.display

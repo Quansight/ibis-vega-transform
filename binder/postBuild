@@ -1,7 +1,13 @@
 #!/usr/bin/env python3
+""" perform a development install of ibis_vega_transform
 
-# based on https://github.com/jupyterlab/jupyterlab-git/blob/master/binder/postBuild
+    On Binder, this will run _after_ the environment has been fully created from
+    the environment.yml in this directory.
 
+    This script should also run locally on Linux/MacOS/Windows:
+
+        python3 binder/postBuild
+"""
 import subprocess
 import sys
 from pathlib import Path
@@ -11,6 +17,7 @@ ROOT = Path.cwd()
 
 def _(*args, **kwargs):
     """ Run a command, echoing the args
+
         fails hard if something goes wrong
     """
     print("\n\t", " ".join(args), "\n")
@@ -23,7 +30,7 @@ def _(*args, **kwargs):
 _(sys.executable, "-m", "pip", "check")
 
 # install the labextension
-_(sys.executable, "-m", "pip", "install", ".")
+_(sys.executable, "-m", "pip", "install", "-e", ".")
 
 # verify the environment the extension didn't break anything
 _(sys.executable, "-m", "pip", "check")
@@ -35,5 +42,5 @@ _("jupyter", "server", "extension", "list")
 _("jupyter", "labextension", "list")
 
 
-print("JupyterLab with jupyterlab_git is ready to run with:\n")
+print("JupyterLab with ibis-vega-transform is ready to run with:\n")
 print("\tjupyter lab\n")

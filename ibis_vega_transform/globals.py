@@ -58,7 +58,7 @@ JSON_DISPLAY = None
 
 def reset_debug():
     global JSON_DISPLAY, DISPLAY
-    JSON_DISPLAY = IPython.display.JSON({}, root="ibis-vega-transform")
+    JSON_DISPLAY = IPython.display.JSON({}, root="ibis_vega_transform")
     DISPLAY = IPython.display.display(JSON_DISPLAY, display_id=True)
 
 

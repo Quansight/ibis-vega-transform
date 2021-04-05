@@ -13,30 +13,39 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+
     env:
       CI: "true"
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
     steps:
       - name: Checkout branch
         uses: actions/checkout@v1
+
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: ibis-vega-transform
           environment-file: binder/environment.yml
+
       - name: List Conda packages
-        shell: bash -l {0}
         run: conda list
+
       - name: Install Ibis Vega Transform extension
-        shell: bash -l {0}
         run: python setup.py develop
+
       - name: Test example notebooks
-        shell: bash -l {0}
         run: xvfb-run --auto-servernum jlpm test
+
       - name: Upload generated images
         uses: actions/upload-artifact@v1
         with:
           name: generated-images
           path: /home/runner/work/ibis-vega-transform/images/
+
       - name: Upload original images
         uses: actions/upload-artifact@v1
         with:

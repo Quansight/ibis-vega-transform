@@ -1,7 +1,0 @@
-{
-  "NotebookApp": {
-    "nbserver_extensions": {
-      "ibis_vega_transform": true
-    }
-  }
-}

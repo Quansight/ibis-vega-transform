@@ -2,6 +2,16 @@ name: ibis-vega-transform
 channels:
   - conda-forge
 dependencies:
+  # jupyterlab runtime dependencies
+  - jupyterlab >=3,<4.0.0a0
+  - jupyter-packaging 0.7.9
+
+  # labextension build dependencies
+  - nodejs >=14,<15
+  - pip
+  - wheel
+
+  # force jaeger <1.22
   - jaeger <1.22
   - jaeger-agent <1.22.0
   - jaeger-all-in-one <1.22.0
@@ -9,29 +19,31 @@ dependencies:
   - jaeger-example-hotrod <1.22.0
   - jaeger-ingester <1.22.0
   - jaeger-query <1.22.0
-  - jupyterlab 3.*
-  - jupyter-packaging 0.8.1
-  # force the pandas used by pymapd
+
+  # runtime dependencies
+
   - pandas
+  # install pymapd to enforce the dependencies specific for pymapd 0.24.*
   - pymapd 0.24.*
-  # AttributeError: module 'sqlalchemy' has no attribute 'Binary'
-  # https://stackoverflow.com/questions/65851741/attributeerror-module-sqlalchemy-has-no-attribute-binary
-  # this is used by ibis, maybe it should be pinned or fixed in the next version.
-  - sqlalchemy <1.4
+
   # ibis doesn't support python 3.6 anymore
   # ibis.omniscidb doesn't support 3.8 yet
   - python 3.7.*
-  - nodejs 14.*
   - notebook
   - tornado
   - graphviz
   - altair
-  - pip
   - black
 
   # fix conflicts
+
   # error: chardet 4.0.0 is installed but chardet<4.0,>=2.0 is required by {'aiohttp'}
   - chardet<4.0,>=2.0
   # pymapd 0.24.2 has requirement pyarrow==0.15.0, but you have pyarrow 0.15.1
   - pyarrow 0.15.0
   - arrow-cpp 0.15.0
+
+  # AttributeError: module 'sqlalchemy' has no attribute 'Binary'
+  # https://stackoverflow.com/questions/65851741/attributeerror-module-sqlalchemy-has-no-attribute-binary
+  # this is used by ibis, maybe it should be pinned or fixed in the next version.
+  - sqlalchemy <1.4
