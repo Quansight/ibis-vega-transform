@@ -55,7 +55,7 @@
     "@jupyterlab/rendermime-interfaces": "^3.0.0",
     "@lumino/coreutils": "^1.4.2",
     "@lumino/widgets": "^1.11.1",
-    "jupyter-jaeger": "file:///home/xmn/dev/quansight/omnisci-project/jupyter-jaeger/jupyter-jaeger-1.0.4.tgz",
+    "jupyter-jaeger": "^1.0.1",
     "vega": "^5.13.0",
     "vega-embed": "^6.10.0",
     "vega-lite": "^4.13.1"

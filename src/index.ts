@@ -26,8 +26,8 @@ const extension: JupyterFrontEndPlugin<void> = {
  * rendermime registries that knows how to lazily fetch ibis transforms
  * from the server.
  */
-function activate(_: JupyterFrontEnd, notebooks: INotebookTracker) {
-  notebooks.widgetAdded.connect((_, widget) => {
+function activate(_: JupyterFrontEnd, nbtracker: INotebookTracker) {
+  nbtracker.widgetAdded.connect((_, widget) => {
     widget.content.rendermime.addFactory(
       {
         safe: true,
