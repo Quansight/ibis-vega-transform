@@ -25,9 +25,9 @@ jobs:
       run: python -m pip install jupyterlab
     - name: Build the extension
       run: |
-        jlpm
-        jlpm run tslint
         python -m pip install .
+
+        jlpm run tslint
 
         # jupyter serverextension list 2>&1 | grep -ie "ibis_vega_transform.*OK"
 
