@@ -4,7 +4,7 @@ import * as vega from 'vega';
 import vegaEmbed from 'vega-embed';
 import { compileSpec } from './compiler';
 import ibisTransform from './transform';
-import { client } from 'jupyter-jaeger';
+import { client } from 'jupyter_jaeger';
 import { Kernel } from '@jupyterlab/services';
 
 export const MIME_TYPE = 'application/vnd.vega.ibis.v5+json';

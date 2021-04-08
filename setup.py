@@ -77,8 +77,7 @@ setup_args = dict(
         "altair-transform",
         "ibis-framework>=1.3.0",
         "jaeger-client",
-        # git+https://github.com/xmnlab/jupyter-jaeger.git@add-support-for-jlab3v2
-        "jupyter_jaeger @ git+https://github.com/xmnlab/jupyter-jaeger.git@add-support-for-jlab3v2",
+        "jupyter_jaeger @ git+https://github.com/Quansight/jupyter-jaeger.git@master",
         "jupyterlab_server",
         "mypy_extensions",
         "nbclassic>=0.2",

@@ -2,7 +2,7 @@ import { Kernel } from '@jupyterlab/services';
 import { JSONObject, PromiseDelegate } from '@lumino/coreutils';
 import * as vega from 'vega';
 import * as dataflow from 'vega-dataflow';
-import { client } from 'jupyter-jaeger';
+import { client } from 'jupyter_jaeger';
 
 /**
  * Tries parsing all string values as dates.  Any that cannot be parsed are left alone
