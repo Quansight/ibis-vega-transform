@@ -92,7 +92,7 @@ setup_args = dict(
     ],
     zip_safe=False,
     include_package_data=True,
-    python_requires=">=3.7,<3.8",
+    python_requires=">=3.7,<3.9",
     license="Apache-2.0",
     platforms="Linux, Mac OS X, Windows",
     keywords=["Jupyter", "JupyterLab", "JupyterLab3"],

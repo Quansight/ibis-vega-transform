@@ -24,7 +24,7 @@ dependencies:
 
   - pandas
   # install pymapd to enforce the dependencies specific for pymapd 0.24.*
-  - pymapd 0.24.*
+  - pymapd >=0.24
 
   # ibis doesn't support python 3.6 anymore
   - python 3.8.*
