@@ -6,8 +6,8 @@ Python evaluation of Vega transforms using Ibis expressions.
 
 For inspiration, see https://github.com/jakevdp/altair-transform
 
-This extension is composed of a Python package named `ibis_vega_transform`
-for the server extension and a NPM package named `ibis_vega_transform`
+This extension is composed of a Python package named `ibis-vega-transform`
+for the server extension and a NPM package named `ibis-vega-transform`
 for the frontend extension.
 
 ## Requirements

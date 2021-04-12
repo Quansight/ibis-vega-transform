@@ -1,5 +1,5 @@
 """
-ibis_vega_transform setup
+ibis-vega-transform setup
 """
 import json
 import os
@@ -32,7 +32,7 @@ package_data_spec = {
     ]
 }
 
-labext_name = "ibis_vega_transform"
+labext_name = "ibis-vega-transform"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, lab_path, "**"),

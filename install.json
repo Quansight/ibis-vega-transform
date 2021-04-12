@@ -1,5 +1,5 @@
 {
   "packageManager": "python",
-  "packageName": "ibis_vega_transform",
-  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package ibis_vega_transform"
+  "packageName": "ibis-vega-transform",
+  "uninstallInstructions": "Use your Python package manager (pip, conda, etc.) to uninstall the package ibis-vega-transform"
 }

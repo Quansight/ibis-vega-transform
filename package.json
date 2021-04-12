@@ -1,5 +1,5 @@
 {
-  "name": "ibis_vega_transform",
+  "name": "ibis-vega-transform",
   "version": "5.3.0",
   "description": "A JupyterLab extension for performing Vega transforms lazily using Ibis.",
   "keywords": [
@@ -104,7 +104,7 @@
           "pip"
         ],
         "base": {
-          "name": "ibis_vega_transform"
+          "name": "ibis-vega-transform"
         }
       }
     },
