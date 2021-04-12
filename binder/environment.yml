@@ -27,8 +27,7 @@ dependencies:
   - pymapd 0.24.*
 
   # ibis doesn't support python 3.6 anymore
-  # ibis.omniscidb doesn't support 3.8 yet
-  - python 3.7.*
+  - python 3.8.*
   - notebook
   - tornado
   - graphviz
@@ -39,9 +38,6 @@ dependencies:
 
   # error: chardet 4.0.0 is installed but chardet<4.0,>=2.0 is required by {'aiohttp'}
   - chardet<4.0,>=2.0
-  # pymapd 0.24.2 has requirement pyarrow==0.15.0, but you have pyarrow 0.15.1
-  - pyarrow 0.15.0
-  - arrow-cpp 0.15.0
 
   # AttributeError: module 'sqlalchemy' has no attribute 'Binary'
   # https://stackoverflow.com/questions/65851741/attributeerror-module-sqlalchemy-has-no-attribute-binary

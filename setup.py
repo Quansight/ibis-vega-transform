@@ -77,13 +77,13 @@ setup_args = dict(
         "altair-transform",
         "ibis-framework>=1.3.0",
         "jaeger-client",
-        "jupyter_jaeger @ git+https://github.com/Quansight/jupyter-jaeger.git@master",
+        "jupyter-jaeger>=1.0.4",
         "jupyterlab_server",
         "mypy_extensions",
         "nbclassic>=0.2",
         "opentracing",
         # NOTE: remove pymapd pinning when ibis v2 is ready
-        "pymapd==0.24.*",
+        "pymapd>=0.24",
         # NOTE: current ibis version doesn't work with sqlalchemy 1.4
         "sqlalchemy<1.4",
         "tornado",
