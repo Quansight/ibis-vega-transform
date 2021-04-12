@@ -1,72 +1,110 @@
-"""Setup script for Ibis Vega Transform."""
-
-# Standard library imports
-import ast
+"""
+ibis-vega-transform setup
+"""
+import json
 import os
 
-# Third party imports
+from jupyter_packaging import (
+    create_cmdclass, install_npm, ensure_targets,
+    combine_commands, skip_if_exists
+)
 import setuptools
 
-# Constants
 HERE = os.path.abspath(os.path.dirname(__file__))
 
+# The name of the project
+name="ibis_vega_transform"
 
-def get_version(module="ibis_vega_transform"):
-    """Get version."""
-    data = read(os.path.join(HERE, module, "__init__.py"))
-    lines = data.split("\n")
-    for line in lines:
-        if line.startswith("__version__"):
-            version = ast.literal_eval(line.split("=")[-1].strip())
-            return version
+# Get our version
+with open(os.path.join(HERE, 'package.json')) as f:
+    version = json.load(f)['version']
 
+lab_path = os.path.join(HERE, name, "labextension")
 
-def read(path, encoding="utf-8"):
-    """
-    Read file specified by path relative to file and return content.
-    """
-    path = os.path.join(HERE, path)
+# Representative files that should exist after a successful build
+jstargets = [
+    os.path.join(lab_path, "package.json"),
+]
 
-    content = ""
-    if os.path.exists(path):
-        with open(path, encoding=encoding) as fh:
-            content = fh.read()
+package_data_spec = {
+    name: [
+        "*"
+    ]
+}
 
-    return content
+labext_name = "ibis-vega-transform"
 
+data_files_spec = [
+    ("share/jupyter/labextensions/%s" % labext_name, lab_path, "**"),
+    ("share/jupyter/labextensions/%s" % labext_name, HERE, "install.json"),("etc/jupyter/jupyter_server_config.d",
+     "jupyter-config", "ibis_vega_transform.json"),
 
-setuptools.setup(
+]
+
+cmdclass = create_cmdclass("jsdeps",
+    package_data_spec=package_data_spec,
+    data_files_spec=data_files_spec
+)
+
+js_command = combine_commands(
+    install_npm(HERE, build_cmd="build:prod", npm=["jlpm"]),
+    ensure_targets(jstargets),
+)
+
+is_repo = os.path.exists(os.path.join(HERE, ".git"))
+if is_repo:
+    cmdclass["jsdeps"] = js_command
+else:
+    cmdclass["jsdeps"] = skip_if_exists(jstargets, js_command)
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
+setup_args = dict(
     name="ibis-vega-transform",
-    version=get_version(),
+    version=version,
     url="https://github.com/Quansight/ibis-vega-transform",
-    author="Ian Rose and Saul Shanabrook",
-    author_email="ian.rose@quansight.com",
-    license="Apache-2.0 license",
-    description="Evaluate Vega transforms using Ibis expressions",
-    long_description=read("README.md"),
+    author="OmniSci/Quansight",
+    description="Evaluate Vega transforms using Ibis expressions.",
+    long_description= long_description,
     long_description_content_type="text/markdown",
+    cmdclass=cmdclass,
     packages=setuptools.find_packages(),
     install_requires=[
+        "jupyterlab>=3.0.0rc13,==3.*",
+        "setuptools>=46.4.0",
         "altair>=4.0.0",
         "altair-transform",
         "ibis-framework>=1.3.0",
         "jaeger-client",
-        "jupyter_jaeger>=1.0.3",
-        "jupyterlab==3.*",
+        "jupyter-jaeger>=1.0.4",
+        "jupyterlab_server",
         "mypy_extensions",
-        "pymapd",
+        "nbclassic>=0.2",
+        "opentracing",
+        # NOTE: remove pymapd pinning when ibis v2 is ready
+        "pymapd>=0.24",
+        # NOTE: current ibis version doesn't work with sqlalchemy 1.4
         "sqlalchemy<1.4",
         "tornado",
         "typing_extensions",
         "vega_datasets",
     ],
-    extras_require={"dev": ["black"]},
-    python_requires=">=3.7",
+    zip_safe=False,
     include_package_data=True,
+    python_requires=">=3.7,<3.9",
+    license="Apache-2.0",
+    platforms="Linux, Mac OS X, Windows",
+    keywords=["Jupyter", "JupyterLab", "JupyterLab3"],
     classifiers=[
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
+        "License :: OSI Approved :: BSD License",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Framework :: Jupyter",
     ],
 )
+
+
+if __name__ == "__main__":
+    setuptools.setup(**setup_args)

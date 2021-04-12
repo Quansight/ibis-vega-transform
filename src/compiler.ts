@@ -6,7 +6,7 @@ import { mergeDeep } from 'vega-lite/build/src/util';
 import * as themes from 'vega-themes';
 
 import { extractTransforms } from './transformextract';
-const COMM_ID = 'ibis-vega-transform:compiler';
+const COMM_ID = 'ibis_vega_transform:compiler';
 
 /**
  * Takes in a Vega-Lite spec and returns a compiled Vega spec,

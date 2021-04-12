@@ -2,18 +2,19 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
+
 import { INotebookTracker } from '@jupyterlab/notebook';
 import { IbisVegaRenderer, MIME_TYPE } from './renderer';
 
 /**
  * A plugin ID for the extension.
  */
-const PLUGIN_ID = 'ibis-vega-transform:plugin';
+const PLUGIN_ID = 'ibis_vega_transform:plugin';
 
 /**
  * The JupyterLab plugin metadata.
  */
-const plugin: JupyterFrontEndPlugin<void> = {
+const extension: JupyterFrontEndPlugin<void> = {
   activate,
   id: PLUGIN_ID,
   requires: [INotebookTracker],
@@ -25,8 +26,8 @@ const plugin: JupyterFrontEndPlugin<void> = {
  * rendermime registries that knows how to lazily fetch ibis transforms
  * from the server.
  */
-function activate(_: JupyterFrontEnd, notebooks: INotebookTracker) {
-  notebooks.widgetAdded.connect((_, widget) => {
+function activate(_: JupyterFrontEnd, nbtracker: INotebookTracker) {
+  nbtracker.widgetAdded.connect((_, widget) => {
     widget.content.rendermime.addFactory(
       {
         safe: true,
@@ -43,4 +44,4 @@ function activate(_: JupyterFrontEnd, notebooks: INotebookTracker) {
   });
 }
 
-export default plugin;
+export default extension;

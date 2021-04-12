@@ -1,6 +1,6 @@
 {
   "name": "ibis-vega-transform",
-  "version": "5.2.2",
+  "version": "5.3.0",
   "description": "A JupyterLab extension for performing Vega transforms lazily using Ibis.",
   "keywords": [
     "jupyter",
@@ -15,7 +15,7 @@
   "author": "OmniSci/Quansight",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
-    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    "style/**/*.{css,.js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -25,61 +25,91 @@
     "url": "https://github.com/Quansight/ibis-vega-transform.git"
   },
   "scripts": {
-    "build": "tsc",
-    "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "prepublish": "jlpm run clean && jlpm run build",
+    "build": "jlpm run build:lib && jlpm run build:labextension:dev",
+    "build:prod": "jlpm run build:lib && jlpm run build:labextension",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "clean": "jlpm run clean:lib",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:labextension": "rimraf ibis_vega_transform/labextension",
+    "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
+    "eslint": "eslint . --ext .ts,.tsx --fix",
+    "eslint:check": "eslint . --ext .ts,.tsx",
+    "install:extension": "jupyter labextension develop --overwrite .",
+    "prepare": "jlpm run clean && jlpm run build:prod",
     "prettier": "prettier --write '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}'",
     "tslint": "tslint -c tslint.json --project tsconfig.json '**/*{.ts,.tsx}'",
-    "watch": "tsc -w",
     "test": "env JEST_PUPPETEER_CONFIG=./config/jest/jest-puppeteer.config.js jest --runInBand --verbose=true --detectOpenHandles --config ./config/jest/jest.config.js",
-    "test:debug": "env HEADLESS=false SLOWMO=true jlpm test"
+    "test:debug": "env HEADLESS=false SLOWMO=true jlpm test",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:src": "tsc -w",
+    "watch:labextension": "jupyter labextension watch ."
   },
   "dependencies": {
     "@jupyterlab/application": "^3.0.0",
+    "@jupyterlab/coreutils": "^5.0.0",
     "@jupyterlab/docregistry": "^3.0.0",
     "@jupyterlab/notebook": "^3.0.0",
     "@jupyterlab/rendermime-interfaces": "^3.0.0",
-    "@jupyterlab/services": "^6.0.5",
+    "@jupyterlab/services": "^6.0.0",
     "@lumino/coreutils": "^1.4.2",
     "@lumino/widgets": "^1.11.1",
-    "jupyter-jaeger": "^1.0.1",
+    "jupyter-jaeger": "^1.0.4",
     "vega": "^5.13.0",
     "vega-embed": "^6.10.0",
     "vega-lite": "^4.13.1"
   },
   "devDependencies": {
+    "@jupyterlab/builder": "^3.0.0",
     "@types/expect-puppeteer": "^3.3.2",
     "@types/jaeger-client": "3.15.3",
     "@types/jest": "^24.0.25",
     "@types/jest-environment-puppeteer": "^4.3.1",
     "@types/node": "^13.1.2",
     "@types/puppeteer": "^2.0.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.9.0",
-    "eslint-plugin-prettier": "^3.0.1",
+    "@typescript-eslint/eslint-plugin": "^2.27.0",
+    "@typescript-eslint/parser": "^2.27.0",
+    "eslint": "^7.5.0",
+    "eslint-config-prettier": "^6.10.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "husky": "^3.1.0",
     "jest": "^24.9.0",
     "jest-circus": "^24.9.0",
     "jest-environment-puppeteer-jsdom": "^4.3.1",
     "jest-puppeteer": "^4.4.0",
     "lint-staged": "^9.5.0",
-    "prettier": "^1.17.0",
+    "mkdirp": "^1.0.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.19.0",
     "puppeteer": "^2.0.0",
     "resemblejs": "^3.2.3",
-    "rimraf": "^3.0.0",
+    "rimraf": "^3.0.2",
     "ts-jest": "^24.1.0",
     "tslint": "^5.15.0",
     "tslint-config-prettier": "^1.18.0",
     "tslint-plugin-prettier": "^2.1.0",
     "tslint-react": "^4.0.0",
-    "typescript": "~3.8.3",
-    "@jupyterlab/builder": "^3.0.5"
+    "typescript": "~3.8.3"
   },
   "sideEffects": [
-    "style/*.css"
+    "style/*.css",
+    "style/index.js"
   ],
+  "styleModule": "style/index.js",
   "jupyterlab": {
-    "extension": true
+    "discovery": {
+      "server": {
+        "managers": [
+          "pip"
+        ],
+        "base": {
+          "name": "ibis-vega-transform"
+        }
+      }
+    },
+    "extension": true,
+    "outputDir": "ibis_vega_transform/labextension"
   },
   "husky": {
     "hooks": {
